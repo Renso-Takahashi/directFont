@@ -7,6 +7,7 @@ using namespace plugin;
 class DirectFontPlugin {
 public:
     DirectFontPlugin() {
+        Events::gameProcessEvent += CNewFonts::FontMenu;
         Events::initRwEvent += CNewFonts::Initialise;
         Events::shutdownRwEvent += CNewFonts::Shutdown;
         Events::d3dLostEvent += CNewFonts::Lost;
