@@ -3,94 +3,164 @@
 void LatinTranslation::TranslateString(char *str) {
     char *pText = str;
     while (*pText) {
-		switch (*pText) {
-		case 'ò':
-			*pText = '·';
-			break;
-		case 'ó':
-			*pText = '‡';
-			break;
-		case 'ö':
-			*pText = '„';
-			break;
-		case 'ô':
-			*pText = '‚';
-			break;
-		case 'û':
-			*pText = 'È';
-			break;
-		case 'ü':
-			*pText = 'Í';
-			break;
-		case '¢':
-			*pText = 'Ì';
-			break;
-		case '¶':
-			*pText = 'Û';
-			break;
-		case '•':
-			*pText = 'Ú';
-			break;
-		case '®':
-			*pText = 'ı';
-			break;
-		case 'ß':
-			*pText = 'Ù';
-			break;
-		case '™':
-			*pText = '˙';
-			break;
-		case 'ú':
-			*pText = 'Á';
-			break;
-		case 'Å':
-			*pText = '¡';
-			break;
-		case 'Ä':
-			*pText = '¿';
-			break;
-		case 'É':
-			*pText = '√';
-			break;
-		case 'Ç':
-			*pText = '¬';
-			break;
-		case 'á':
-			*pText = '…';
-			break;
-		case 'à':
-			*pText = ' ';
-			break;
-		case 'ã':
-			*pText = 'Õ';
-			break;
-		case 'å':
-			*pText = 'Œ';
-			break;
-		case 'è':
-			*pText = '”';
-			break;
-		case 'éè':
-			*pText = '“';
-			break;
-		case 'ëè':
-			*pText = '’';
-			break;
-		case 'ê':
-			*pText = '‘';
-			break;
-		case 'ìè':
-			*pText = '⁄';
-			break;
-		case 'íè':
-			*pText = 'Ÿ';
-			break;
-		case 'ï':
-			*pText = '‹';
-			break;
-		case 'Ö':
-			*pText = '«';
-			break;
+		switch (*pText)
+		{
+			case '\x5E':
+				*pText = '¬°';
+				break;
+			case '\x7B':
+				*pText = '?';
+				break;
+			case '\x7C':
+				*pText = '¬∞';
+				break;
+			case '\x80':
+				*pText = '√Ä';
+				break;
+			case '\x81':
+				*pText = '√Å';
+				break;
+			case '\x82':
+				*pText = '√Ç';
+				break;
+			case '\x83':
+				*pText = '√Ñ';
+				break;
+			case '\x84':
+				*pText = '√Ü';
+				break;
+			case '\x85':
+				*pText = '√á';
+				break;
+			case '\x86':
+				*pText = '√à';
+				break;
+			case '\x87':
+				*pText = '√â';
+				break;
+			case '\x88':
+				*pText = '√ä';
+				break;
+			case '\x89':
+				*pText = '√ã';
+				break;
+			case '\x8A':
+				*pText = '√å';
+				break;
+			case '\x8B':
+				*pText = '√ç';
+				break;
+			case '\x8C':
+				*pText = '√é';
+				break;
+			case '\x8D':
+				*pText = '√è';
+				break;
+			case '\x8E':
+				*pText = '√í';
+				break;
+			case '\x8F':
+				*pText = '√ì';
+				break;
+			case '\x90':
+				*pText = '√î';
+				break;
+			case '\x91':
+				*pText = '√ñ';
+				break;
+			case '\x92':
+				*pText = '√ô';
+				break;
+			case '\x93':
+				*pText = '√ö';
+				break;
+			case '\x94':
+				*pText = '√õ';
+				break;
+			case '\x95':
+				*pText = '√ú';
+				break;
+			case '\x96':
+				*pText = '√ü';
+				break;
+			case '\x97':
+				*pText = '√†';
+				break;
+			case '\x98':
+				*pText = '√°';
+				break;
+			case '\x99':
+				*pText = '√¢';
+				break;
+			case '\x9A':
+				*pText = '√§';
+				break;
+			case '\x9B':
+				*pText = '√¶';
+				break;
+			case '\x9C':
+				*pText = '√ß';
+				break;
+			case '\x9D':
+				*pText = '√®';
+				break;
+			case '\x9E':
+				*pText = '√©';
+				break;
+			case '\x9F':
+				*pText = '√™';
+				break;
+			case '\xA0':
+				*pText = '√´';
+				break;
+			case '\xA1':
+				*pText = '√¨';
+				break;
+			case '\xA2':
+				*pText = '√≠';
+				break;
+			case '\xA3':
+				*pText = '√Æ';
+				break;
+			case '\xA4':
+				*pText = '√Ø';
+				break;
+			case '\xA5':
+				*pText = '√≤';
+				break;
+			case '\xA6':
+				*pText = '√≥';
+				break;
+			case '\xA7':
+				*pText = '√¥';
+				break;
+			case '\xA8':
+				*pText = '√∂';
+				break;
+			case '\xA9':
+				*pText = '√π';
+				break;
+			case '\xAA':
+				*pText = '√∫';
+				break;
+			case '\xAB':
+				*pText = '√ª';
+				break;
+			case '\xAC':
+				*pText = '√º';
+				break;
+			case '\xAD':
+				*pText = '√ë';
+				break;
+			case '\xAE':
+				*pText = '√±';
+				break;
+			case '\xAF':
+				*pText = '¬ø';
+				break;
+			case '\xBA':
+				*pText = ':';
+				break;
 		}
         pText++;
     }
