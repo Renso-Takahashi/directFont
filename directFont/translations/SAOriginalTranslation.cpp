@@ -1,3 +1,5 @@
+// It is not used but I have put it "just in case"
+
 #include "SAOriginalTranslation.h"
 
 #define FONT_00 0
@@ -44,7 +46,7 @@ void SAOriginalTranslation::TranslateString(char *str, int Font_Number) {
 					*pText = ' ';
 				break;
 			case '\x40':
-				*pText = '°';
+				*pText = '¬°';
 				break;
 			case '\x5B':
 				if(Font_Number == FONT_03)
@@ -55,7 +57,7 @@ void SAOriginalTranslation::TranslateString(char *str, int Font_Number) {
 					*pText = '*';
 				break;
 			case '\x5E':
-				*pText = '°';
+				*pText = '¬°';
 				break;
 			case '\x60':
 				*pText = ' ';
@@ -64,7 +66,7 @@ void SAOriginalTranslation::TranslateString(char *str, int Font_Number) {
 				*pText = '?';
 				break;
 			case '\x7C':
-				*pText = '∞';
+				*pText = '¬∞';
 				break;
 			case '\x7D':
 				if(Font_Number == FONT_03)
@@ -85,150 +87,150 @@ void SAOriginalTranslation::TranslateString(char *str, int Font_Number) {
 					*pText = ' ';
 				break;
 			case '\x80':
-				*pText = '¿';
+				*pText = '√Ä';
 				break;
 			case '\x81':
-				*pText = '¡';
+				*pText = '√Å';
 				break;
 			case '\x82':
-				*pText = '¬';
+				*pText = '√Ç';
 				break;
 			case '\x83':
-				*pText = 'ƒ';
+				*pText = '√Ñ';
 				break;
 			case '\x84':
-				*pText = '∆';
+				*pText = '√Ü';
 				break;
 			case '\x85':
-				*pText = '«';
+				*pText = '√á';
 				break;
 			case '\x86':
-				*pText = '»';
+				*pText = '√à';
 				break;
 			case '\x87':
-				*pText = '…';
+				*pText = '√â';
 				break;
 			case '\x88':
-				*pText = ' ';
+				*pText = '√ä';
 				break;
 			case '\x89':
-				*pText = 'À';
+				*pText = '√ã';
 				break;
 			case '\x8A':
-				*pText = 'Ã';
+				*pText = '√å';
 				break;
 			case '\x8B':
-				*pText = 'Õ';
+				*pText = '√ç';
 				break;
 			case '\x8C':
-				*pText = 'Œ';
+				*pText = '√é';
 				break;
 			case '\x8D':
-				*pText = 'œ';
+				*pText = '√è';
 				break;
 			case '\x8E':
-				*pText = '“';
+				*pText = '√í';
 				break;
 			case '\x8F':
-				*pText = '”';
+				*pText = '√ì';
 				break;
 			case '\x90':
-				*pText = '‘';
+				*pText = '√î';
 				break;
 			case '\x91':
-				*pText = '÷';
+				*pText = '√ñ';
 				break;
 			case '\x92':
-				*pText = 'Ÿ';
+				*pText = '√ô';
 				break;
 			case '\x93':
-				*pText = '⁄';
+				*pText = '√ö';
 				break;
 			case '\x94':
-				*pText = '€';
+				*pText = '√õ';
 				break;
 			case '\x95':
-				*pText = '‹';
+				*pText = '√ú';
 				break;
 			case '\x96':
-				*pText = 'ﬂ';
+				*pText = '√ü';
 				break;
 			case '\x97':
-				*pText = '‡';
+				*pText = '√†';
 				break;
 			case '\x98':
-				*pText = '·';
+				*pText = '√°';
 				break;
 			case '\x99':
-				*pText = '‚';
+				*pText = '√¢';
 				break;
 			case '\x9A':
-				*pText = '‰';
+				*pText = '√§';
 				break;
 			case '\x9B':
-				*pText = 'Ê';
+				*pText = '√¶';
 				break;
 			case '\x9C':
-				*pText = 'Á';
+				*pText = '√ß';
 				break;
 			case '\x9D':
-				*pText = 'Ë';
+				*pText = '√®';
 				break;
 			case '\x9E':
-				*pText = 'È';
+				*pText = '√©';
 				break;
 			case '\x9F':
-				*pText = 'Í';
+				*pText = '√™';
 				break;
 			case '\xA0':
-				*pText = 'Î';
+				*pText = '√´';
 				break;
 			case '\xA1':
-				*pText = 'Ï';
+				*pText = '√¨';
 				break;
 			case '\xA2':
-				*pText = 'Ì';
+				*pText = '√≠';
 				break;
 			case '\xA3':
-				*pText = 'Ó';
+				*pText = '√Æ';
 				break;
 			case '\xA4':
-				*pText = 'Ô';
+				*pText = '√Ø';
 				break;
 			case '\xA5':
-				*pText = 'Ú';
+				*pText = '√≤';
 				break;
 			case '\xA6':
-				*pText = 'Û';
+				*pText = '√≥';
 				break;
 			case '\xA7':
-				*pText = 'Ù';
+				*pText = '√¥';
 				break;
 			case '\xA8':
-				*pText = 'ˆ';
+				*pText = '√∂';
 				break;
 			case '\xA9':
-				*pText = '˘';
+				*pText = '√π';
 				break;
 			case '\xAA':
-				*pText = '˙';
+				*pText = '√∫';
 				break;
 			case '\xAB':
-				*pText = '˚';
+				*pText = '√ª';
 				break;
 			case '\xAC':
-				*pText = '¸';
+				*pText = '√º';
 				break;
 			case '\xAD':
-				*pText = '—';
+				*pText = '√ë';
 				break;
 			case '\xAE':
-				*pText = 'Ò';
+				*pText = '√±';
 				break;
 
 			case '\xAF':
 				if(Font_Number == FONT_01)
-					*pText = 'ø';
+					*pText = '¬ø';
 				else
 					*pText = ' ';
 				break;
@@ -351,79 +353,79 @@ void SAOriginalTranslation::TranslateString(char *str, int Font_Number) {
 				break;
 
 			case '\xD5':
-				*pText = '¿';
+				*pText = '√Ä';
 				break;
 			case '\xD6':
-				*pText = '¡';
+				*pText = '√Å';
 				break;
 			case '\xD7':
-				*pText = '¬';
+				*pText = '√Ç';
 				break;
 			case '\xD8':
-				*pText = 'ƒ';
+				*pText = '√Ñ';
 				break;
 			case '\xD9':
-				*pText = '∆';
+				*pText = '√Ü';
 				break;
 			case '\xDA':
-				*pText = '«';
+				*pText = '√á';
 				break;
 			case '\xDB':
-				*pText = '»';
+				*pText = '√à';
 				break;
 			case '\xDC':
-				*pText = '…';
+				*pText = '√â';
 				break;
 			case '\xDD':
-				*pText = ' ';
+				*pText = '√ä';
 				break;
 			case '\xDE':
-				*pText = 'À';
+				*pText = '√ã';
 				break;
 			case '\xDF':
-				*pText = 'Ã';
+				*pText = '√å';
 				break;
 			case '\xE0':
-				*pText = 'Õ';
+				*pText = '√ç';
 				break;
 			case '\xE1':
-				*pText = 'Œ';
+				*pText = '√é';
 				break;
 			case '\xE2':
-				*pText = 'œ';
+				*pText = '√è';
 				break;
 			case '\xE3':
-				*pText = '“';
+				*pText = '√í';
 				break;
 			case '\xE4':
-				*pText = '”';
+				*pText = '√ì';
 				break;
 			case '\xE5':
-				*pText = '‘';
+				*pText = '√î';
 				break;
 			case '\xE6':
-				*pText = '÷';
+				*pText = '√ñ';
 				break;
 			case '\xE7':
-				*pText = 'Ÿ';
+				*pText = '√ô';
 				break;
 			case '\xE8':
-				*pText = '⁄';
+				*pText = '√ö';
 				break;
 			case '\xE9':
-				*pText = '€';
+				*pText = '√õ';
 				break;
 			case '\xEA':
-				*pText = '‹';
+				*pText = '√ú';
 				break;
 			case '\xEB':
-				*pText = 'ﬂ';
+				*pText = '√ü';
 				break;
 			case '\xEC':
-				*pText = '—';
+				*pText = '√ë';
 				break;
 			case '\xED':
-				*pText = 'ø';
+				*pText = '¬ø';
 				break;
 			case '\xEE':
 				if(Font_Number == FONT_03)
