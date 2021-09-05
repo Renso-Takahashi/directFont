@@ -1,10 +1,23 @@
+/* ###############################################################
+
+ Data conversion is used during calculations because
+ there is code where integrals are processed with floats
+
+ I cannot say if it is effective but I suppose it will have
+ some impact on the precision with which the texts are
+ displayed, positioned and/or scaled...
+
+################################################################*/
+
 #include "CNewFonts.h"
 #include "plugin.h"
 #include "game_sa\CSprite2d.h"
 #include "game_sa\CMessages.h"
 #include "game_sa\CHudColours.h"
-#include "translations\SanLtdTranslation.h"
 #include "translations\LatinTranslation.h"
+#include "translations\CustomTranslator.h"
+#include "translations\SanLtdTranslation.h"
+#include "translations\SAOriginalTranslation.h"
 #include <stdio.h>
 
 using namespace plugin;
@@ -17,19 +30,20 @@ eFontStyle CNewFonts::m_FontId;
 CRGBA CNewFonts::gLetterColors[MAX_TEXT_SIZE];
 unsigned int CNewFonts::gNumLetters;
 bool CNewFonts::gShadow;
+static char transln[50];
 
 bool CNewFont::SetupFont(char *fontName, unsigned int width, int height, float scaleX, float scaleY, unsigned int weight, bool italic,
     unsigned int charSet, unsigned int outputPrecision, unsigned int quality, unsigned int pitchAndFamily, bool upperCase,
     bool replaceUS)
 {
     HRESULT hr = D3DXCreateFont(CNewFonts::GetCurrentDevice(), width, height, weight, 0, italic, charSet, outputPrecision, quality,
-        pitchAndFamily, fontName, &m_pD3DXFont);
+        ((pitchAndFamily == 0) ? pitchAndFamily| FF_DONTCARE : pitchAndFamily), fontName, &m_pD3DXFont);
     if (hr != S_OK) {
         m_pD3DXFont = NULL;
         return Error("CNewFont::SetupFont: Can't load \"%s\" font", fontName);
     }
     m_initialised = true;
-    strcpy_s(m_fontName, fontName);
+    strcpy(m_fontName, fontName);
     m_width = width;
     m_height = height;
     m_scaleX = scaleX;
@@ -48,47 +62,47 @@ bool CNewFont::SetupFont(char *fontName, unsigned int width, int height, float s
 void CNewFont::PrintString(char *text, CRect const& rect, float scale_x, float scale_y, CRGBA const& color, DWORD format, CRGBA const* backgroundColor,
     float shadow, float outline, CRGBA const* dropColor)
 {
-    RECT d3drect; SetRect(&d3drect, rect.left, rect.top, rect.right, rect.bottom);
+    RECT d3drect; SetRect(&d3drect, (int)rect.left, (int)rect.top, (int)rect.right, (int)rect.bottom);
     if (backgroundColor)
         DrawRect(text, rect, scale_x, scale_y, format, *backgroundColor);
-    RECT d3drect2; SetRect(&d3drect2, d3drect.left / (scale_x / 2), d3drect.top / (scale_y / 2), d3drect.right / (scale_x / 2), d3drect.bottom / (scale_y / 2));
+    RECT d3drect2; SetRect(&d3drect2, (int)(d3drect.left / (scale_x / 2)), (int)(d3drect.top / (scale_y / 2)), (int)(d3drect.right / (scale_x / 2)), (int)(d3drect.bottom / (scale_y / 2)));
     D3DXMATRIX S, P;
-    D3DXMatrixScaling(&S, scale_x / 2, scale_y / 2, 1.0f);
+    D3DXMatrixScaling(&S, scale_x / 2.0f, scale_y / 2.0f, 1.0f);
     CNewFonts::m_pFontSprite->GetTransform(&P);
     CNewFonts::m_pFontSprite->SetTransform(&S);
     CNewFonts::m_pFontSprite->Begin(D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE);
     if (shadow > 0.0f) {
         RECT shadowRect(d3drect2);
-        shadowRect.left += shadow;
-        shadowRect.right += shadow;
-        shadowRect.top += shadow;
-        shadowRect.bottom += shadow;
+        shadowRect.left += (long)shadow;
+        shadowRect.right += (long)shadow;
+        shadowRect.top += (long)shadow;
+        shadowRect.bottom += (long)shadow;
         CNewFonts::gShadow = true;
         m_pD3DXFont->DrawText(CNewFonts::m_pFontSprite, text, -1, &shadowRect, format, D3DCOLOR_ARGB(dropColor->a,
             dropColor->r, dropColor->g, dropColor->b));
     }
     else if (outline > 0.0f) {
         RECT outl1(d3drect2);
-        outl1.left -= outline;
-        outl1.right -= outline;
+        outl1.left -= (long)outline;
+        outl1.right -= (long)outline;
         CNewFonts::gShadow = true;
         m_pD3DXFont->DrawText(CNewFonts::m_pFontSprite, text, -1, &outl1, format, D3DCOLOR_ARGB(dropColor->a,
             dropColor->r, dropColor->g, dropColor->b));
         RECT outl2(d3drect2);
-        outl2.left += outline;
-        outl2.right += outline;
+        outl2.left += (long)outline;
+        outl2.right += (long)outline;
         CNewFonts::gShadow = true;
         m_pD3DXFont->DrawText(CNewFonts::m_pFontSprite, text, -1, &outl2, format, D3DCOLOR_ARGB(dropColor->a,
             dropColor->r, dropColor->g, dropColor->b));
         RECT outl3(d3drect2);
-        outl3.top -= outline;
-        outl3.bottom -= outline;
+        outl3.top -= (long)outline;
+        outl3.bottom -= (long)outline;
         CNewFonts::gShadow = true;
         m_pD3DXFont->DrawText(CNewFonts::m_pFontSprite, text, -1, &outl3, format, D3DCOLOR_ARGB(dropColor->a,
             dropColor->r, dropColor->g, dropColor->b));
         RECT outl4(d3drect2);
-        outl4.top += outline;
-        outl4.bottom += outline;
+        outl4.top += (long)outline;
+        outl4.bottom += (long)outline;
         CNewFonts::gShadow = true;
         m_pD3DXFont->DrawText(CNewFonts::m_pFontSprite, text, -1, &outl4, format, D3DCOLOR_ARGB(dropColor->a,
             dropColor->r, dropColor->g, dropColor->b));
@@ -103,17 +117,17 @@ void CNewFont::PrintString(char *text, CRect const& rect, float scale_x, float s
 
 void CNewFont::DrawRect(char *text, CRect const& rect, float scale_x, float scale_y, DWORD format, CRGBA const& backgroundColor) {
     float x2 = rect.right;
-    RECT d3drect; SetRect(&d3drect, rect.left, rect.top, rect.right, rect.bottom);
-    RECT d3drect2; SetRect(&d3drect2, d3drect.left / (scale_x / 2), d3drect.top / (scale_y / 2), d3drect.right / (scale_x / 2), d3drect.bottom / (scale_y / 2));
+    RECT d3drect; SetRect(&d3drect, (int)rect.left, (int)rect.top, (int)rect.right, (int)rect.bottom);
+    RECT d3drect2; SetRect(&d3drect2, (int)(d3drect.left / (scale_x / 2)), (int)(d3drect.top / (scale_y / 2)), (int)(d3drect.right / (scale_x / 2)), (int)(d3drect.bottom / (scale_y / 2)));
     D3DXMATRIX S, P;
-    D3DXMatrixScaling(&S, scale_x / 2, scale_y / 2, 1.0f);
+    D3DXMatrixScaling(&S, scale_x / 2.0f, scale_y / 2.0f, 1.0f);
     CNewFonts::m_pFontSprite->GetTransform(&P);
     CNewFonts::m_pFontSprite->SetTransform(&S);
     CNewFonts::m_pFontSprite->Begin(0);
     this->m_pD3DXFont->DrawText(CNewFonts::m_pFontSprite, text, -1, &d3drect2, format | DT_CALCRECT, 0xFFFFFFFF);
     CNewFonts::m_pFontSprite->SetTransform(&P);
     CNewFonts::m_pFontSprite->End();
-    CSprite2d::DrawRect(CRect(d3drect2.left*(scale_x / 2) - 8, d3drect2.top*(scale_y / 2) - 8, x2 + 8, d3drect2.bottom*(scale_y / 2) + 8), backgroundColor);
+    CSprite2d::DrawRect(CRect(d3drect2.left*(scale_x / 2.0f) - 8.0f, d3drect2.top*(scale_y / 2.0f) - 8.0f, x2 + 8.0f, (float)d3drect2.bottom*(scale_y / 2.0f) + 8.0f), backgroundColor);
 }
 
 void CNewFont::ReleaseFont() {
@@ -138,26 +152,16 @@ float __declspec(naked) _GetWidth() {
 }
 
 void CNewFonts::Initialise() {
-    char app[8];
-    char fontName[256];
-    char scaleFactorStr[16];
-    char translation[16];
-    unsigned int fontId;
+    char app[8], fontName[256], scaleFactorStr[16], translation[16];
+    unsigned int fontId, height, weight, charSet, outputPrecision,
+        quality, pitchAndFamily;
     int width;
-    unsigned int height;
-    float scaleX;
-    float scaleY;
-    unsigned int weight;
-    bool italic;
-    unsigned int charSet;
-    unsigned int outputPrecision;
-    unsigned int quality;
-    unsigned int pitchAndFamily;
-    bool upperCase;
-    bool replaceUS;
+    float scaleX, scaleY;
+    bool italic, upperCase,replaceUS;
+
     for (int i = 0; i < MAX_NUM_FONTS; i++) {
-        sprintf(app, "FONT%d", i + 1);
-        GetPrivateProfileString(app, "FontName", "USE_DEFAULT", fontName, 256, PLUGIN_PATH("directFont.ini"));
+        wsprintf(app, "FONT%d", i + 1);
+        GetPrivateProfileString(app, "FontName", "USE_DEFAULT", fontName, 256, PLUGIN_PATH("directFont\\directFont.ini"));
         if (!strcmp(fontName, "USE_DEFAULT")) {
             m_aFonts[i].m_initialised = false;
             continue;
@@ -185,35 +189,52 @@ void CNewFonts::Initialise() {
                 m_aFonts[fontId].m_replaceUS);
         }
         else {
-            height = GetPrivateProfileInt(app, "Height", 64, PLUGIN_PATH("directFont.ini"));
-            width = GetPrivateProfileInt(app, "Width", 40, PLUGIN_PATH("directFont.ini"));
-            GetPrivateProfileString(app, "ScaleFactor.x", "0.6", scaleFactorStr, 16, PLUGIN_PATH("directFont.ini"));
+            height = GetPrivateProfileInt(app, "Height", 64, PLUGIN_PATH("directFont\\directFont.ini"));
+            width = GetPrivateProfileInt(app, "Width", 40, PLUGIN_PATH("directFont\\directFont.ini"));
+            GetPrivateProfileString(app, "ScaleFactor.x", "0.6", scaleFactorStr, 16, PLUGIN_PATH("directFont\\directFont.ini"));
             sscanf(scaleFactorStr, "%f", &scaleX);
-            GetPrivateProfileString(app, "ScaleFactor.y", "0.4", scaleFactorStr, 16, PLUGIN_PATH("directFont.ini"));
+            GetPrivateProfileString(app, "ScaleFactor.y", "0.4", scaleFactorStr, 16, PLUGIN_PATH("directFont\\directFont.ini"));
             sscanf(scaleFactorStr, "%f", &scaleY);
-            weight = GetPrivateProfileInt(app, "Weight", 500, PLUGIN_PATH("directFont.ini"));
-            italic = GetPrivateProfileInt(app, "Italic", 0, PLUGIN_PATH("directFont.ini"));
-            charSet = GetPrivateProfileInt(app, "CharSet", 1, PLUGIN_PATH("directFont.ini"));
-            outputPrecision = GetPrivateProfileInt(app, "OutputPrecision", 0, PLUGIN_PATH("directFont.ini"));
-            quality = GetPrivateProfileInt(app, "Quality", 0, PLUGIN_PATH("directFont.ini"));
-            pitchAndFamily = GetPrivateProfileInt(app, "PitchAndFamily", 0, PLUGIN_PATH("directFont.ini"));
-            upperCase = GetPrivateProfileInt(app, "UpcaseAlways", 0, PLUGIN_PATH("directFont.ini"));
-            replaceUS = GetPrivateProfileInt(app, "ReplaceUnderscoreWithSpace", 0, PLUGIN_PATH("directFont.ini"));
+            weight = GetPrivateProfileInt(app, "Weight", 500, PLUGIN_PATH("directFont\\directFont.ini"));
+            italic = GetPrivateProfileInt(app, "Italic", 0, PLUGIN_PATH("directFont\\directFont.ini"));
+            charSet = GetPrivateProfileInt(app, "CharSet", 1, PLUGIN_PATH("directFont\\directFont.ini"));
+            outputPrecision = GetPrivateProfileInt(app, "OutputPrecision", 0, PLUGIN_PATH("directFont\\directFont.ini"));
+            quality = GetPrivateProfileInt(app, "Quality", 0, PLUGIN_PATH("directFont\\directFont.ini"));
+            pitchAndFamily = GetPrivateProfileInt(app, "PitchAndFamily", 0, PLUGIN_PATH("directFont\\directFont.ini"));
+            upperCase = GetPrivateProfileInt(app, "UpcaseAlways", 0, PLUGIN_PATH("directFont\\directFont.ini"));
+            replaceUS = GetPrivateProfileInt(app, "ReplaceUnderscoreWithSpace", 0, PLUGIN_PATH("directFont\\directFont.ini"));
             m_aFonts[i].SetupFont(fontName, width, height, scaleX, scaleY, weight, italic, charSet, outputPrecision, quality, pitchAndFamily,
                 upperCase, replaceUS);
         }
     }
-    GetPrivateProfileString("GENERAL", "UseTranslator", "NONE", translation, 16, PLUGIN_PATH("directFont.ini"));
+
+    // Added the Custom Translator
+    GetPrivateProfileString("GENERAL", "UseTranslator", "NONE", translation, 16, PLUGIN_PATH("directFont\\directFont.ini"));
     if (!strncmp(translation, "NONE", 4))
-        m_Translation = TRANSLATION_NONE;
+        m_Translation = eTranslation::TRANSLATION_NONE;
     else if (!strncmp(translation, "SANLTD", 6))
-        m_Translation = TRANSLATION_SANLTD;
-	else if (!strncmp(translation, "LATIN", 6))
-		m_Translation = TRANSLATION_LATIN;
+        m_Translation = eTranslation::TRANSLATION_SANLTD;
+	else if (!strncmp(translation, "LATIN", 5))
+		m_Translation = eTranslation::TRANSLATION_LATIN;
+	else if (!strncmp(translation, "CUSTOM", 6))
+		m_Translation = eTranslation::TRANSLATION_CUSTOM;
     else {
         Error("CNewFonts::Initialise\nUnknown translation name.");
-        m_Translation = TRANSLATION_NONE;
+        m_Translation = eTranslation::TRANSLATION_NONE;
     }
+
+    // Load the custom translator
+    if (m_Translation == eTranslation::TRANSLATION_CUSTOM)
+    {
+        GetPrivateProfileString("GENERAL", "CustomTranslator", "NONE", transln, 50, PLUGIN_PATH("directFont\\directFont.ini"));
+        transln[strlen(transln)] = '\0';
+        CustomTranslator tr;
+        if (!tr.Initialize(transln)) {
+            Error("CNewFonts::Initialise\nCan't load the Custom Translator.");
+            m_Translation = eTranslation::TRANSLATION_NONE;
+        }
+    }
+
     patch::RedirectJump(0x71A700, PrintString);
     patch::RedirectJump(0x71A0E6, _GetWidth);
     patch::SetChar(0x58DCEF, '*');
@@ -251,13 +272,13 @@ IDirect3DDevice9 *CNewFonts::GetCurrentDevice() {
     return _RwD3DDevice;
 }
 
-void _UpCase(unsigned char *str) {
-    unsigned char *pStr = str;
+void _UpCase(char *str) {
+    char *pStr = str;
     while (*pStr) {
-        if ((*pStr >= 97 && *pStr <= 122) || (*pStr >= 224 && *pStr <= 255))
-            *pStr = *pStr - 32;
-        else if (*pStr == 183)
-            *pStr = 167;
+        if ((*pStr >= 'a' && *pStr <= 'z') || (*pStr >= 'à' && *pStr <= 'ÿ'))
+            *pStr -= 0x20;
+        else if (*pStr == '·')
+            *pStr = '§';
         pStr++;
     }
 }
@@ -265,7 +286,7 @@ void _UpCase(unsigned char *str) {
 void ReplaceUsWithSpace(unsigned char *str) {
     unsigned char *pStr = str;
     while (*pStr) {
-        if (*pStr == '_')
+        if (*pStr == '\x5F')
             *pStr = ' ';
         pStr++;
     }
@@ -274,10 +295,19 @@ void ReplaceUsWithSpace(unsigned char *str) {
 void CNewFonts::PrintString(float x, float y, char *text) {
     if (m_aFonts[m_FontId].m_initialised) {
         static char taggedText[MAX_TEXT_SIZE];
+
+        // FillMemory fills the variable with zeros, preventing GetStringWidth()
+        // from detecting old text fragments and causing text alignment problems
+        // when returning a larger value
+        // (Visible in the subtitles where there are texts that appear higher even
+        // having only one line ...) 
+
+        FillMemory(taggedText, MAX_TEXT_SIZE, 0);
+
         CRect *rect;
         unsigned int flag;
         if (CFont::m_bFontCentreAlign) {
-            rect = &CRect(x - CFont::m_fFontCentreSize / 2, y, x + CFont::m_fFontCentreSize / 2, SCREEN_HEIGHT);
+            rect = &CRect(x - CFont::m_fFontCentreSize / 2.0f, y, x + CFont::m_fFontCentreSize / 2.0f, SCREEN_HEIGHT);
             flag = DT_CENTER;
         }
         else if (CFont::m_bFontRightAlign) {
@@ -289,21 +319,25 @@ void CNewFonts::PrintString(float x, float y, char *text) {
             flag = DT_LEFT;
         }
         ProcessTags(taggedText, text);
-        if (m_Translation == TRANSLATION_SANLTD) {
+        if (m_Translation == eTranslation::TRANSLATION_SANLTD) {
             SanLtdTranslation tr;
             tr.TranslateString(taggedText);
-        } else if (m_Translation == TRANSLATION_LATIN) {
+        } else if (m_Translation == eTranslation::TRANSLATION_LATIN) {
 			LatinTranslation tr;
 			tr.TranslateString(taggedText);
+		} else if (m_Translation == eTranslation::TRANSLATION_CUSTOM) {
+            // Load a different character map per font
+            CustomTranslator tr;
+			tr.TranslateString(taggedText, m_FontId);
 		}
         if (m_aFonts[m_FontId].m_upperCase)
-            _UpCase((unsigned char *)taggedText);
+            _UpCase((char *)taggedText);
         if (m_aFonts[m_FontId].m_replaceUS)
             ReplaceUsWithSpace((unsigned char *)taggedText);
         m_aFonts[m_FontId].PrintString(taggedText, *rect, CFont::m_Scale->x * m_aFonts[m_FontId].m_scaleX,
             CFont::m_Scale->y * m_aFonts[m_FontId].m_scaleY, *CFont::m_Color,
             DT_TOP | DT_NOCLIP | DT_WORDBREAK | flag, CFont::m_bFontBackground ? CFont::m_FontBackgroundColor : NULL,
-            CFont::m_nFontShadow * 2, CFont::m_nFontOutlineSize * 2, CFont::m_FontDropColor);
+            (float)(CFont::m_nFontShadow * 2), (float)(CFont::m_nFontOutlineSize * 2), CFont::m_FontDropColor);
     }
     else
         CFont::PrintString(x, y, text);
@@ -325,110 +359,110 @@ HRESULT CD3DSprite::Draw(LPDIRECT3DTEXTURE9 pTexture, CONST RECT * pSrcRect, CON
 }
 
 void CNewFonts::ProcessTags(char *dest, char *src) {
-    bool bBreak = false;
     static char text[MAX_TEXT_SIZE];
-    char *pDest = dest;
-    char *pText = text;
-    strcpy_s(text, src);
+
+    // You will already know the reason for the FillMemory
+    // if you saw my other comment :P
+    FillMemory(text, MAX_TEXT_SIZE, 0);
+
+    //char *pDest = dest, *pText = text;
+    strncpy_s(text, src, strlen(src));
     CMessages::InsertPlayerControlKeysInString(text);
+    char *outText = dest;
     CRGBA currColor(*CFont::m_Color);
-    unsigned int numLetters = 0;
-    while (true) {
-        // if string was finished
-        if (!*pText)
+    unsigned int numLetters = 0, txtidx = 0;
+    for (size_t i = 0; i <= strlen(text); i++)
+    {
+        if (i == strlen(text))
+        {
+            *outText = '\0';
             break;
-        // if we found a tag
-        if (*pText == '~') {
-            // process tag
-            pText++;
-            // if string was finished
-            if (!*pText)
-                break;
-            // if new line tag
-            switch (*pText) {
-            case 'N':
-            case 'n':
-                *pDest = '\n';
-                pDest++;
-                pText++;
-                break;
-            case 'R':
-            case 'r':
-                currColor = CRGBA(HudColour.GetRGB(0, CFont::m_Color->a));
-                pText++;
-                break;
-            case 'G':
-            case 'g':
-                currColor = CRGBA(HudColour.GetRGB(1, CFont::m_Color->a));
-                pText++;
-                break;
-            case 'B':
-            case 'b':
-                currColor = CRGBA(HudColour.GetRGB(2, CFont::m_Color->a));
-                pText++;
-                break;
-            case 'W':
-            case 'w':
-                currColor = CRGBA(HudColour.GetRGB(4, CFont::m_Color->a));
-                pText++;
-                break;
-            case 'H':
-            case 'h':
-                currColor = CRGBA(min((float)CFont::m_Color->r * 1.5f, 255.0f),
-                    min((float)CFont::m_Color->g * 1.5f, 255.0f),
-                    min((float)CFont::m_Color->b * 1.5f, 255.0f),
-                    CFont::m_Color->a);
-                pText++;
-                break;
-            case 'Y':
-            case 'y':
-                currColor = CRGBA(HudColour.GetRGB(11, CFont::m_Color->a));
-                pText++;
-                break;
-            case 'P':
-            case 'p':
-                currColor = CRGBA(HudColour.GetRGB(7, CFont::m_Color->a));
-                pText++;
-                break;
-            case 'l':
-                currColor = CRGBA(HudColour.GetRGB(5, CFont::m_Color->a));
-                pText++;
-                break;
-            case 'S':
-            case 's':
-                currColor = CRGBA(HudColour.GetRGB(4, CFont::m_Color->a));
-                pText++;
-                break;
+        } else if (text[i] == '~' && text[i + 2] == '~')
+        {
+            i++;
+            switch (text[i])
+            {
+                case 'N':
+                case 'n':
+                    *outText = '\x0A';
+                    outText++;
+                    i++;
+                    break;
+                case 'R':
+                case 'r':
+                    currColor = CRGBA(HudColour.GetRGB(0, CFont::m_Color->a));
+                    i++;
+                    break;
+                case 'G':
+                case 'g':
+                    currColor = CRGBA(HudColour.GetRGB(1, CFont::m_Color->a));
+                    i++;
+                    break;
+                case 'B':
+                case 'b':
+                    currColor = CRGBA(HudColour.GetRGB(2, CFont::m_Color->a));
+                    i++;
+                    break;
+                case 'W':
+                case 'w':
+                    currColor = CRGBA(HudColour.GetRGB(4, CFont::m_Color->a));
+                    i++;
+                    break;
+                case 'H':
+                case 'h':
+                    currColor = CRGBA((unsigned char)(min((float)CFont::m_Color->r * 1.5f, 255.0f)),
+                        (unsigned char)(min((float)CFont::m_Color->g * 1.5f, 255.0f)),
+                        (unsigned char)(min((float)CFont::m_Color->b * 1.5f, 255.0f)),
+                        CFont::m_Color->a);
+                    i++;
+                    break;
+                case 'Y':
+                case 'y':
+                    currColor = CRGBA(HudColour.GetRGB(11, CFont::m_Color->a));
+                    i++;
+                    break;
+                case 'P':
+                case 'p':
+                    currColor = CRGBA(HudColour.GetRGB(7, CFont::m_Color->a));
+                    i++;
+                    break;
+                case 'L':
+                case 'l':
+                    currColor = CRGBA(HudColour.GetRGB(5, CFont::m_Color->a));
+                    i++;
+                    break;
+                case 'S':
+                case 's':
+                    currColor = CRGBA(HudColour.GetRGB(4, CFont::m_Color->a));
+                    i++;
+                    break;
+                default:
+                    i++;
+                    break;
             }
-            // close tag
-            while (*pText != '~') {
-                if (!pText) {
-                    *pDest = '\0';
-                    return;
-                }
-                pText++;
-            }
-            pText++;
-        }
-        else {
-            *pDest = *pText;
-            if (*pText != ' ') {
+        } else {
+            *outText = text[i];
+            if (text[i] != ' ') {
                 gLetterColors[numLetters] = currColor;
                 numLetters++;
             }
-            pDest++;
-            pText++;
+            outText++;
         }
     }
-    *pDest = '\0';
 }
 
 float CNewFonts::GetStringWidth(char *str, char bFull, char bScriptText) {
     if (m_aFonts[m_FontId].m_initialised) {
         static char text[MAX_TEXT_SIZE];
         static char taggedText[MAX_TEXT_SIZE];
+
+        // Well history repeats itself XD
+        // You already know what the FillMemory is for :P
+        FillMemory(text, MAX_TEXT_SIZE, 0);
+        FillMemory(taggedText, MAX_TEXT_SIZE, 0);
+
         char *pText = taggedText;
-        strncpy(text, str, CMessages::GetStringLength(str));
+        strncpy(text, str, strlen(str));
         CNewFonts::ProcessTags(taggedText, text);
         if (!bFull)
         {
@@ -447,14 +481,17 @@ float CNewFont::GetStringWidth(char *str) {
     float scale_y = CFont::m_Scale->y * m_scaleY;
     RECT d3drect; SetRect(&d3drect, 0, 0, 0, 0);
     D3DXMATRIX S, P;
-    D3DXMatrixScaling(&S, scale_x / 2, scale_y / 2, 1.0f);
+    D3DXMatrixScaling(&S, scale_x / 2.0f, scale_y / 2.0f, 1.0f);
     CNewFonts::m_pFontSprite->GetTransform(&P);
     CNewFonts::m_pFontSprite->SetTransform(&S);
     CNewFonts::m_pFontSprite->Begin(0);
     this->m_pD3DXFont->DrawText(CNewFonts::m_pFontSprite, str, -1, &d3drect, DT_TOP | DT_NOCLIP | DT_SINGLELINE | DT_CALCRECT, 0xFFFFFFFF);
     CNewFonts::m_pFontSprite->SetTransform(&P);
     CNewFonts::m_pFontSprite->End();
-    return (d3drect.right - d3drect.left) * (scale_x / 2);
+
+    // Values are enclosed between "(" and ")" to prevent the function from
+    // returning the wrong value...
+    return (((float)d3drect.right - (float)d3drect.left) * scale_x) / 2.0f;
 }
 
 void CNewFonts::SetFontStyle(eFontStyle style) {
