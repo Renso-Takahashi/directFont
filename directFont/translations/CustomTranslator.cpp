@@ -91,8 +91,12 @@ bool CustomTranslator::LoadMap(char* filename, char font)
 
 				fseek(CustomMap, offset, SEEK_SET);
 
-				FillMemory(fontmap[font], 208, 0);
-				//memcpy(fontmap[font], FillMap, 208);
+				// FillMemory is not necessary in this case because
+				// Memcpy is used to fill the buffer with the
+				// original character map... 
+				
+				//FillMemory(fontmap[font], 208, 0);
+				memcpy(fontmap[font], FillMap, 208);
 
 				for (WORD x = 0; x < (size - 1); x++)
 				{
