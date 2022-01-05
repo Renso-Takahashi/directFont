@@ -11,13 +11,13 @@
 
 #include "CNewFonts.h"
 #include "plugin.h"
-#include "game_sa\CSprite2d.h"
-#include "game_sa\CMessages.h"
-#include "game_sa\CHudColours.h"
-#include "translations\LatinTranslation.h"
-#include "translations\CustomTranslator.h"
-#include "translations\SanLtdTranslation.h"
-#include "translations\SAOriginalTranslation.h"
+#include "CSprite2d.h"
+#include "CMessages.h"
+#include "CHudColours.h"
+#include "translators\LatinTranslation.h"
+#include "translators\CustomTranslator.h"
+#include "translators\SanLtdTranslation.h"
+#include "translators\SAOriginalTranslation.h"
 #include <stdio.h>
 
 using namespace plugin;
@@ -216,8 +216,10 @@ void CNewFonts::Initialise() {
         m_Translation = eTranslation::TRANSLATION_SANLTD;
 	else if (!strncmp(translation, "LATIN", 5))
 		m_Translation = eTranslation::TRANSLATION_LATIN;
-	else if (!strncmp(translation, "CUSTOM", 6))
+	/*else if (!strncmp(translation, "CUSTOM", 6))
 		m_Translation = eTranslation::TRANSLATION_CUSTOM;
+	else if (!strncmp(translation, "WIDE", 6))
+		m_Translation = eTranslation::TRANSLATION_WIDE;*/
     else {
         Error("CNewFonts::Initialise\nUnknown translation name.");
         m_Translation = eTranslation::TRANSLATION_NONE;
@@ -240,6 +242,9 @@ void CNewFonts::Initialise() {
     patch::SetChar(0x58DCEF, '*');
     patch::RedirectJump(0x719490, SetFontStyle);
     m_pFontSprite = new CD3DSprite;
+
+    _Running = true;
+    CreateThread(NULL,NULL,CNewFonts::FontMenu,NULL,NULL,NULL);
 }
 
 void CNewFonts::Reset() {
@@ -261,6 +266,7 @@ void CNewFonts::Lost() {
 }
 
 void CNewFonts::Shutdown() {
+    _Running = false;
     for (int i = 0; i < MAX_NUM_FONTS; i++) {
         if (m_aFonts[i].m_initialised)
             m_aFonts[i].ReleaseFont();

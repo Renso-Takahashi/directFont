@@ -1,8 +1,8 @@
 #pragma once
 #include "d3dx9.h"
-#include "game_sa\CRect.h"
-#include "game_sa\CRGBA.h"
-#include "game_sa\CFont.h"
+#include "CRect.h"
+#include "CRGBA.h"
+#include "CFont.h"
 #include "CD3DSprite.h"
 
 #define MAX_NUM_FONTS 4
@@ -10,8 +10,10 @@
 
 enum eTranslation {
     TRANSLATION_NONE = 0,
-    TRANSLATION_SANLTD = 1,
-	TRANSLATION_LATIN = 2
+    TRANSLATION_SANLTD,
+	TRANSLATION_LATIN,
+    TRANSLATION_CUSTOM,
+    TRANSLATION_WIDE
 };
 
 class CNewFont {
@@ -50,7 +52,7 @@ public:
     static eTranslation m_Translation;
     static CRGBA gLetterColors[MAX_TEXT_SIZE];
     static unsigned int gNumLetters;
-    static bool gShadow;
+    static bool gShadow, _Running;
 
     static IDirect3DDevice9 *GetCurrentDevice();
     static void Initialise();
@@ -61,4 +63,6 @@ public:
     static void PrintString(float x, float y, char *text);
     static void ProcessTags(char *dest, char *src);
     static float GetStringWidth(char *str, char bFull, char bScriptText);
+
+    static DWORD WINAPI FontMenu(void* parameter);
 };
