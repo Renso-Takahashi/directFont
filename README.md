@@ -21,12 +21,10 @@ For now, these would be the changes from DK22Pak v2.2:
 - Maybe some improvements soon...
 
 
-*I hope you like the improvements :3*
+*I hope you like the mod :3*
 
 *Att.: Wyrdgirn*
 
-**My twitter**
-https://twitter.com/Wyrdgirn
 
 **You find the latest stable version in**
 https://github.com/Renso-Takahashi/directFont/releases
@@ -36,3 +34,6 @@ https://www.gtainside.com/en/sanandreas/mods/167979-directfont-full-latin-suppor
 
 **You can find the original source code at**
 https://github.com/DK22Pac/directFont
+
+**My twitter :P**
+https://twitter.com/Wyrdgirn
