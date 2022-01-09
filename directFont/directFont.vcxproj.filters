@@ -59,21 +59,21 @@
     <Filter Include="translators">
       <UniqueIdentifier>{6af7e0a6-5f85-4733-80f3-44f7badefe55}</UniqueIdentifier>
     </Filter>
-    <Filter Include="translations">
-      <UniqueIdentifier>{4f1405c2-5cf3-4573-b3cc-ed6417cc533f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source">
       <UniqueIdentifier>{d2579071-08e1-4010-807b-14ef5be2f027}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Translations">
+      <UniqueIdentifier>{4f1405c2-5cf3-4573-b3cc-ed6417cc533f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\directFont.ini" />
     <None Include="..\copymod.bat" />
     <None Include="..\Translations\Latin.ini">
-      <Filter>translations</Filter>
+      <Filter>Translations</Filter>
     </None>
     <None Include="..\Translations\test.ini">
-      <Filter>translations</Filter>
+      <Filter>Translations</Filter>
     </None>
   </ItemGroup>
 </Project>
