@@ -1,6 +1,6 @@
 # directFont V3 WideFont Edition
 
- This is an updated version of the directFont mod version 2.2 created by DK22Pac and updated by me (Wyrdgirn)
+ This is a new version of the directFont mod version 2.2 created by DK22Pac and updated by me (Wyrdgirn)
 
 
 The initial objective was to add support for Latin characters (Spanish, Portuguese...) but now my goal is to give support to more languages which need a set of UNICODE characters which the game does not support natively, for this I use a translator that detects a text and replaces it on the fly with a UNICODE, thus allowing you to replace any text in the game simply by editing a text file ...
