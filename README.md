@@ -29,6 +29,7 @@ For now, these would be the changes from DK22Pak v2.2:
 https://twitter.com/Wyrdgirn
 
 **You find the latest stable version in**
+https://github.com/Renso-Takahashi/directFont/releases
 
 **You can find the mod also in my GTAInside profile**
 https://www.gtainside.com/en/sanandreas/mods/167979-directfont-full-latin-support/
