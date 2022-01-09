@@ -62,18 +62,9 @@
     <Filter Include="Source">
       <UniqueIdentifier>{d2579071-08e1-4010-807b-14ef5be2f027}</UniqueIdentifier>
     </Filter>
-    <Filter Include="translations">
-      <UniqueIdentifier>{2dfdc978-24ba-4d23-934f-92bad8ccc784}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\directFont.ini" />
     <None Include="..\copymod.bat" />
-    <None Include="..\Translations\Latin.ini">
-      <Filter>translations</Filter>
-    </None>
-    <None Include="..\Translations\test.ini">
-      <Filter>translations</Filter>
-    </None>
   </ItemGroup>
 </Project>

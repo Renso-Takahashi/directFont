@@ -126,8 +126,6 @@
   <ItemGroup>
     <None Include="..\copymod.bat" />
     <None Include="..\directFont.ini" />
-    <None Include="..\Translations\Latin.ini" />
-    <None Include="..\Translations\test.ini" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
