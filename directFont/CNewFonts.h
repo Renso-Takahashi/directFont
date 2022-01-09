@@ -37,11 +37,15 @@ public:
         unsigned int charSet, unsigned int outputPrecision, unsigned int quality, unsigned int pitchAndFamily, bool upperCase, bool replaceUS);
     void PrintString(char *text, CRect const& rect, float scale_x, float scale_y, CRGBA const& color, DWORD format,
         CRGBA const* backgroundColor, float shadow, float outline, CRGBA const* dropColor);
+    void PrintString(wchar_t *text, CRect const& rect, float scale_x, float scale_y, CRGBA const& color, DWORD format,
+        CRGBA const* backgroundColor, float shadow, float outline, CRGBA const* dropColor);
     void DrawRect(char *text, CRect const& rect, float scale_x, float scale_y, DWORD format, CRGBA const& backgroundColor);
+    void DrawRect(wchar_t *text, CRect const& rect, float scale_x, float scale_y, DWORD format, CRGBA const& backgroundColor);
     void ReleaseFont();
     void OnLost();
     void OnReset();
     float GetStringWidth(char *str);
+    float GetStringWidth(wchar_t *str);
 };
 
 class CNewFonts {
@@ -62,6 +66,7 @@ public:
     static void SetFontStyle(eFontStyle style);
     static void PrintString(float x, float y, char *text);
     static void ProcessTags(char *dest, char *src);
+    static void ProcessTags(wchar_t *dest, wchar_t *src);
     static float GetStringWidth(char *str, char bFull, char bScriptText);
 
     static DWORD WINAPI FontMenu(void* parameter);

@@ -6,7 +6,9 @@ class CustomTranslator {
 public:
     static void TranslateString(char *str, int font);
     static bool Initialize(const char* filename);
+    static bool FileExist(char* filename);
 protected:
-    static bool LoadMap(char* filename, char font);
-    //static bool initialized[4];
+    static const char FillMap[208];
+    static char fontmap[4][208];
+    static bool initialized;
 };

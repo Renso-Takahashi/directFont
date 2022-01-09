@@ -25,12 +25,12 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="translators\WideCharSupport.cpp">
+      <Filter>translators</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="translators\BaseTranslation.h">
-      <Filter>translators</Filter>
-    </ClInclude>
-    <ClInclude Include="translators\CustomCharMap.h">
       <Filter>translators</Filter>
     </ClInclude>
     <ClInclude Include="translators\CustomTranslator.h">
@@ -51,6 +51,9 @@
     <ClInclude Include="CNewFonts.h">
       <Filter>Source</Filter>
     </ClInclude>
+    <ClInclude Include="translators\WideCharSupport.h">
+      <Filter>translators</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="translators">
@@ -65,9 +68,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\directFont.ini" />
-    <None Include="..\translations\Latin.ini">
+    <None Include="..\copymod.bat" />
+    <None Include="..\Translations\Latin.ini">
       <Filter>translations</Filter>
     </None>
-    <None Include="..\copymod.bat" />
+    <None Include="..\Translations\test.ini">
+      <Filter>translations</Filter>
+    </None>
   </ItemGroup>
 </Project>

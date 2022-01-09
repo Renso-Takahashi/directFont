@@ -14,6 +14,7 @@
 #include "CSprite2d.h"
 #include "CMessages.h"
 #include "CHudColours.h"
+#include "translators\WideCharSupport.h"
 #include "translators\LatinTranslation.h"
 #include "translators\CustomTranslator.h"
 #include "translators\SanLtdTranslation.h"
@@ -115,6 +116,62 @@ void CNewFont::PrintString(char *text, CRect const& rect, float scale_x, float s
     CNewFonts::m_pFontSprite->End();
 }
 
+void CNewFont::PrintString(wchar_t *text, CRect const& rect, float scale_x, float scale_y, CRGBA const& color, DWORD format, CRGBA const* backgroundColor,
+    float shadow, float outline, CRGBA const* dropColor)
+{
+    RECT d3drect; SetRect(&d3drect, (int)rect.left, (int)rect.top, (int)rect.right, (int)rect.bottom);
+    if (backgroundColor)
+        DrawRect(text, rect, scale_x, scale_y, format, *backgroundColor);
+    RECT d3drect2; SetRect(&d3drect2, (int)(d3drect.left / (scale_x / 2)), (int)(d3drect.top / (scale_y / 2)), (int)(d3drect.right / (scale_x / 2)), (int)(d3drect.bottom / (scale_y / 2)));
+    D3DXMATRIX S, P;
+    D3DXMatrixScaling(&S, scale_x / 2.0f, scale_y / 2.0f, 1.0f);
+    CNewFonts::m_pFontSprite->GetTransform(&P);
+    CNewFonts::m_pFontSprite->SetTransform(&S);
+    CNewFonts::m_pFontSprite->Begin(D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE);
+    if (shadow > 0.0f) {
+        RECT shadowRect(d3drect2);
+        shadowRect.left += (long)shadow;
+        shadowRect.right += (long)shadow;
+        shadowRect.top += (long)shadow;
+        shadowRect.bottom += (long)shadow;
+        CNewFonts::gShadow = true;
+        m_pD3DXFont->DrawTextW(CNewFonts::m_pFontSprite, text, -1, &shadowRect, format, D3DCOLOR_ARGB(dropColor->a,
+            dropColor->r, dropColor->g, dropColor->b));
+    }
+    else if (outline > 0.0f) {
+        RECT outl1(d3drect2);
+        outl1.left -= (long)outline;
+        outl1.right -= (long)outline;
+        CNewFonts::gShadow = true;
+        m_pD3DXFont->DrawTextW(CNewFonts::m_pFontSprite, text, -1, &outl1, format, D3DCOLOR_ARGB(dropColor->a,
+            dropColor->r, dropColor->g, dropColor->b));
+        RECT outl2(d3drect2);
+        outl2.left += (long)outline;
+        outl2.right += (long)outline;
+        CNewFonts::gShadow = true;
+        m_pD3DXFont->DrawTextW(CNewFonts::m_pFontSprite, text, -1, &outl2, format, D3DCOLOR_ARGB(dropColor->a,
+            dropColor->r, dropColor->g, dropColor->b));
+        RECT outl3(d3drect2);
+        outl3.top -= (long)outline;
+        outl3.bottom -= (long)outline;
+        CNewFonts::gShadow = true;
+        m_pD3DXFont->DrawTextW(CNewFonts::m_pFontSprite, text, -1, &outl3, format, D3DCOLOR_ARGB(dropColor->a,
+            dropColor->r, dropColor->g, dropColor->b));
+        RECT outl4(d3drect2);
+        outl4.top += (long)outline;
+        outl4.bottom += (long)outline;
+        CNewFonts::gShadow = true;
+        m_pD3DXFont->DrawTextW(CNewFonts::m_pFontSprite, text, -1, &outl4, format, D3DCOLOR_ARGB(dropColor->a,
+            dropColor->r, dropColor->g, dropColor->b));
+    }
+    CNewFonts::gNumLetters = 0;
+    CNewFonts::gShadow = false;
+    m_pD3DXFont->DrawTextW(CNewFonts::m_pFontSprite, text, -1, &d3drect2, format, D3DCOLOR_ARGB(color.a,
+        color.r, color.g, color.b));
+    CNewFonts::m_pFontSprite->SetTransform(&P);
+    CNewFonts::m_pFontSprite->End();
+}
+
 void CNewFont::DrawRect(char *text, CRect const& rect, float scale_x, float scale_y, DWORD format, CRGBA const& backgroundColor) {
     float x2 = rect.right;
     RECT d3drect; SetRect(&d3drect, (int)rect.left, (int)rect.top, (int)rect.right, (int)rect.bottom);
@@ -125,6 +182,21 @@ void CNewFont::DrawRect(char *text, CRect const& rect, float scale_x, float scal
     CNewFonts::m_pFontSprite->SetTransform(&S);
     CNewFonts::m_pFontSprite->Begin(0);
     this->m_pD3DXFont->DrawText(CNewFonts::m_pFontSprite, text, -1, &d3drect2, format | DT_CALCRECT, 0xFFFFFFFF);
+    CNewFonts::m_pFontSprite->SetTransform(&P);
+    CNewFonts::m_pFontSprite->End();
+    CSprite2d::DrawRect(CRect(d3drect2.left*(scale_x / 2.0f) - 8.0f, d3drect2.top*(scale_y / 2.0f) - 8.0f, x2 + 8.0f, (float)d3drect2.bottom*(scale_y / 2.0f) + 8.0f), backgroundColor);
+}
+
+void CNewFont::DrawRect(wchar_t *text, CRect const& rect, float scale_x, float scale_y, DWORD format, CRGBA const& backgroundColor) {
+    float x2 = rect.right;
+    RECT d3drect; SetRect(&d3drect, (int)rect.left, (int)rect.top, (int)rect.right, (int)rect.bottom);
+    RECT d3drect2; SetRect(&d3drect2, (int)(d3drect.left / (scale_x / 2)), (int)(d3drect.top / (scale_y / 2)), (int)(d3drect.right / (scale_x / 2)), (int)(d3drect.bottom / (scale_y / 2)));
+    D3DXMATRIX S, P;
+    D3DXMatrixScaling(&S, scale_x / 2.0f, scale_y / 2.0f, 1.0f);
+    CNewFonts::m_pFontSprite->GetTransform(&P);
+    CNewFonts::m_pFontSprite->SetTransform(&S);
+    CNewFonts::m_pFontSprite->Begin(0);
+    this->m_pD3DXFont->DrawTextW(CNewFonts::m_pFontSprite, text, -1, &d3drect2, format | DT_CALCRECT, 0xFFFFFFFF);
     CNewFonts::m_pFontSprite->SetTransform(&P);
     CNewFonts::m_pFontSprite->End();
     CSprite2d::DrawRect(CRect(d3drect2.left*(scale_x / 2.0f) - 8.0f, d3drect2.top*(scale_y / 2.0f) - 8.0f, x2 + 8.0f, (float)d3drect2.bottom*(scale_y / 2.0f) + 8.0f), backgroundColor);
@@ -210,16 +282,14 @@ void CNewFonts::Initialise() {
 
     // Added the Custom Translator
     GetPrivateProfileString("GENERAL", "UseTranslator", "NONE", translation, 16, PLUGIN_PATH("directFont\\directFont.ini"));
-    if (!strncmp(translation, "NONE", 4))
+    if (!strncmp(translation, "NONE", 5))
         m_Translation = eTranslation::TRANSLATION_NONE;
-    else if (!strncmp(translation, "SANLTD", 6))
+    else if (!strncmp(translation, "SANLTD", 7))
         m_Translation = eTranslation::TRANSLATION_SANLTD;
-	else if (!strncmp(translation, "LATIN", 5))
+	else if (!strncmp(translation, "LATIN", 6))
 		m_Translation = eTranslation::TRANSLATION_LATIN;
-	/*else if (!strncmp(translation, "CUSTOM", 6))
+	else if (!strncmp(translation, "CUSTOM", 7))
 		m_Translation = eTranslation::TRANSLATION_CUSTOM;
-	else if (!strncmp(translation, "WIDE", 6))
-		m_Translation = eTranslation::TRANSLATION_WIDE;*/
     else {
         Error("CNewFonts::Initialise\nUnknown translation name.");
         m_Translation = eTranslation::TRANSLATION_NONE;
@@ -228,11 +298,22 @@ void CNewFonts::Initialise() {
     // Load the custom translator
     if (m_Translation == eTranslation::TRANSLATION_CUSTOM)
     {
-        GetPrivateProfileString("GENERAL", "CustomTranslator", "NONE", transln, 50, PLUGIN_PATH("directFont\\directFont.ini"));
+        GetPrivateProfileString("GENERAL", "CustomTranslation", "NONE", transln, 50, PLUGIN_PATH("directFont\\directFont.ini"));
         transln[strlen(transln)] = '\0';
         CustomTranslator tr;
         if (!tr.Initialize(transln)) {
             Error("CNewFonts::Initialise\nCan't load the Custom Translator.");
+            m_Translation = eTranslation::TRANSLATION_NONE;
+        }
+    }
+
+    if (GetPrivateProfileInt("GENERAL","UseWideCharTranslator",0,PLUGIN_PATH("directFont\\directFont.ini")) > 0)
+    {
+        GetPrivateProfileString("GENERAL", "WideTranslation", "NONE", transln, 50, PLUGIN_PATH("directFont\\directFont.ini"));
+        transln[strlen(transln)] = '\0';
+        WideSupport tr;
+        if (!tr.Initialize(transln)) {
+            Error("CNewFonts::Initialise\nCan't load the WideChar Translator.");
             m_Translation = eTranslation::TRANSLATION_NONE;
         }
     }
@@ -281,10 +362,10 @@ IDirect3DDevice9 *CNewFonts::GetCurrentDevice() {
 void _UpCase(char *str) {
     char *pStr = str;
     while (*pStr) {
-        if ((*pStr >= 'a' && *pStr <= 'z') || (*pStr >= 'à' && *pStr <= 'ÿ'))
+        if ((*pStr >= '\x61' && *pStr <= '\x7A') || (*pStr >= '\xE0' && *pStr <= '\xFF'))
             *pStr -= 0x20;
-        else if (*pStr == '·')
-            *pStr = '§';
+        else if (*pStr == '\xB7')
+            *pStr = '\xA7';
         pStr++;
     }
 }
@@ -300,7 +381,9 @@ void ReplaceUsWithSpace(unsigned char *str) {
 
 void CNewFonts::PrintString(float x, float y, char *text) {
     if (m_aFonts[m_FontId].m_initialised) {
-        static char taggedText[MAX_TEXT_SIZE];
+        static char taggedText[MAX_TEXT_SIZE] = { 0 };
+        static wchar_t Text[MAX_TEXT_SIZE] = { 0 };
+        static wchar_t TaggedText[MAX_TEXT_SIZE] = { 0 };
 
         // FillMemory fills the variable with zeros, preventing GetStringWidth()
         // from detecting old text fragments and causing text alignment problems
@@ -308,7 +391,10 @@ void CNewFonts::PrintString(float x, float y, char *text) {
         // (Visible in the subtitles where there are texts that appear higher even
         // having only one line ...) 
 
+        // Temporary Disabled...
         FillMemory(taggedText, MAX_TEXT_SIZE, 0);
+        FillMemory(TaggedText, 4096, 0);
+        FillMemory(Text, 4096, 0);
 
         CRect *rect;
         unsigned int flag;
@@ -324,26 +410,44 @@ void CNewFonts::PrintString(float x, float y, char *text) {
             rect = &CRect(x, y, CFont::m_fWrapx, SCREEN_HEIGHT);
             flag = DT_LEFT;
         }
-        ProcessTags(taggedText, text);
-        if (m_Translation == eTranslation::TRANSLATION_SANLTD) {
-            SanLtdTranslation tr;
-            tr.TranslateString(taggedText);
-        } else if (m_Translation == eTranslation::TRANSLATION_LATIN) {
-			LatinTranslation tr;
-			tr.TranslateString(taggedText);
-		} else if (m_Translation == eTranslation::TRANSLATION_CUSTOM) {
-            // Load a different character map per font
-            CustomTranslator tr;
-			tr.TranslateString(taggedText, m_FontId);
-		}
-        if (m_aFonts[m_FontId].m_upperCase)
-            _UpCase((char *)taggedText);
-        if (m_aFonts[m_FontId].m_replaceUS)
-            ReplaceUsWithSpace((unsigned char *)taggedText);
-        m_aFonts[m_FontId].PrintString(taggedText, *rect, CFont::m_Scale->x * m_aFonts[m_FontId].m_scaleX,
-            CFont::m_Scale->y * m_aFonts[m_FontId].m_scaleY, *CFont::m_Color,
-            DT_TOP | DT_NOCLIP | DT_WORDBREAK | flag, CFont::m_bFontBackground ? CFont::m_FontBackgroundColor : NULL,
-            (float)(CFont::m_nFontShadow * 2), (float)(CFont::m_nFontOutlineSize * 2), CFont::m_FontDropColor);
+
+        WideSupport ws;
+
+        if (ws.initialized &&
+            ws.Translate(ws.GetTextID(text, strlen(text)),Text))
+        {
+            ProcessTags(TaggedText, Text);
+            m_aFonts[m_FontId].PrintString(TaggedText, *rect, CFont::m_Scale->x * m_aFonts[m_FontId].m_scaleX,
+                CFont::m_Scale->y * m_aFonts[m_FontId].m_scaleY, *CFont::m_Color,
+                DT_TOP | DT_NOCLIP | DT_WORDBREAK | flag, CFont::m_bFontBackground ? CFont::m_FontBackgroundColor : NULL,
+                (float)(CFont::m_nFontShadow * 2), (float)(CFont::m_nFontOutlineSize * 2), CFont::m_FontDropColor);
+        }
+        else
+        {
+            ProcessTags(taggedText, text);
+            if (m_Translation == eTranslation::TRANSLATION_SANLTD) {
+                SanLtdTranslation tr;
+                tr.TranslateString(taggedText);
+            }
+            else if (m_Translation == eTranslation::TRANSLATION_LATIN) {
+                LatinTranslation tr;
+                tr.TranslateString(taggedText);
+            }
+            else if (m_Translation == eTranslation::TRANSLATION_CUSTOM) {
+                // Load a different character map per font
+                CustomTranslator tr;
+                tr.TranslateString(taggedText, m_FontId);
+            }
+            if (m_aFonts[m_FontId].m_upperCase)
+                _UpCase((char*)taggedText);
+            if (m_aFonts[m_FontId].m_replaceUS)
+                ReplaceUsWithSpace((unsigned char*)taggedText);
+
+            m_aFonts[m_FontId].PrintString(taggedText, *rect, CFont::m_Scale->x * m_aFonts[m_FontId].m_scaleX,
+                CFont::m_Scale->y * m_aFonts[m_FontId].m_scaleY, *CFont::m_Color,
+                DT_TOP | DT_NOCLIP | DT_WORDBREAK | flag, CFont::m_bFontBackground ? CFont::m_FontBackgroundColor : NULL,
+                (float)(CFont::m_nFontShadow * 2), (float)(CFont::m_nFontOutlineSize * 2), CFont::m_FontDropColor);
+        }
     }
     else
         CFont::PrintString(x, y, text);
@@ -365,13 +469,13 @@ HRESULT CD3DSprite::Draw(LPDIRECT3DTEXTURE9 pTexture, CONST RECT * pSrcRect, CON
 }
 
 void CNewFonts::ProcessTags(char *dest, char *src) {
-    static char text[MAX_TEXT_SIZE];
+    static char text[MAX_TEXT_SIZE] = { 0 };
 
     // You will already know the reason for the FillMemory
     // if you saw my other comment :P
+
     FillMemory(text, MAX_TEXT_SIZE, 0);
 
-    //char *pDest = dest, *pText = text;
     strncpy_s(text, src, strlen(src));
     CMessages::InsertPlayerControlKeysInString(text);
     char *outText = dest;
@@ -457,26 +561,141 @@ void CNewFonts::ProcessTags(char *dest, char *src) {
     }
 }
 
+void CNewFonts::ProcessTags(wchar_t *dest, wchar_t *src) {
+    static wchar_t text[MAX_TEXT_SIZE] = { 0 };
+
+    // You will already know the reason for the FillMemory
+    // if you saw my other comment :P
+
+    FillMemory(text, MAX_TEXT_SIZE, 0);
+
+    wcsncpy_s(text, src, wcslen(src));
+
+    wchar_t *outText = dest;
+    CRGBA currColor(*CFont::m_Color);
+    unsigned int numLetters = 0, txtidx = 0;
+    for (size_t i = 0; i <= wcslen(text); i++)
+    {
+        if (i == wcslen(text))
+        {
+            *outText = L'\0';
+            break;
+        } else if (text[i] == L'~' && text[i + 2] == L'~')
+        {
+            i++;
+            switch (text[i])
+            {
+                case L'N':
+                case L'n':
+                    *outText = L'\x0A';
+                    outText++;
+                    i++;
+                    break;
+                case L'R':
+                case L'r':
+                    currColor = CRGBA(HudColour.GetRGB(0, CFont::m_Color->a));
+                    i++;
+                    break;
+                case L'G':
+                case L'g':
+                    currColor = CRGBA(HudColour.GetRGB(1, CFont::m_Color->a));
+                    i++;
+                    break;
+                case L'B':
+                case L'b':
+                    currColor = CRGBA(HudColour.GetRGB(2, CFont::m_Color->a));
+                    i++;
+                    break;
+                case L'W':
+                case L'w':
+                    currColor = CRGBA(HudColour.GetRGB(4, CFont::m_Color->a));
+                    i++;
+                    break;
+                case L'H':
+                case L'h':
+                    currColor = CRGBA((unsigned char)(min((float)CFont::m_Color->r * 1.5f, 255.0f)),
+                        (unsigned char)(min((float)CFont::m_Color->g * 1.5f, 255.0f)),
+                        (unsigned char)(min((float)CFont::m_Color->b * 1.5f, 255.0f)),
+                        CFont::m_Color->a);
+                    i++;
+                    break;
+                case L'Y':
+                case L'y':
+                    currColor = CRGBA(HudColour.GetRGB(11, CFont::m_Color->a));
+                    i++;
+                    break;
+                case L'P':
+                case L'p':
+                    currColor = CRGBA(HudColour.GetRGB(7, CFont::m_Color->a));
+                    i++;
+                    break;
+                case L'L':
+                case L'l':
+                    currColor = CRGBA(HudColour.GetRGB(5, CFont::m_Color->a));
+                    i++;
+                    break;
+                case L'S':
+                case L's':
+                    currColor = CRGBA(HudColour.GetRGB(4, CFont::m_Color->a));
+                    i++;
+                    break;
+                default:
+                    i++;
+                    break;
+            }
+        } else {
+            *outText = text[i];
+            if (text[i] != L' ') {
+                gLetterColors[numLetters] = currColor;
+                numLetters++;
+            }
+            outText++;
+        }
+    }
+}
+
 float CNewFonts::GetStringWidth(char *str, char bFull, char bScriptText) {
     if (m_aFonts[m_FontId].m_initialised) {
-        static char text[MAX_TEXT_SIZE];
-        static char taggedText[MAX_TEXT_SIZE];
+        static char text[MAX_TEXT_SIZE] = { 0 };
+        static char taggedText[MAX_TEXT_SIZE] = { 0 };
+        static wchar_t Text[MAX_TEXT_SIZE] = { 0 };
+        static wchar_t TaggedText[MAX_TEXT_SIZE] = { 0 };
 
-        // Well history repeats itself XD
-        // You already know what the FillMemory is for :P
         FillMemory(text, MAX_TEXT_SIZE, 0);
         FillMemory(taggedText, MAX_TEXT_SIZE, 0);
+        FillMemory(Text, 4096, 0);
+        FillMemory(TaggedText, 4096, 0);
 
-        char *pText = taggedText;
-        strncpy(text, str, strlen(str));
-        CNewFonts::ProcessTags(taggedText, text);
-        if (!bFull)
+        WideSupport ws;
+
+        if (ws.initialized &&
+            ws.Translate(ws.GetTextID(str, strlen(str)), TaggedText))
         {
-            while (*pText && *pText != ' ')
-                pText++;
-            *pText = '\0';
+            wcsncpy(Text, TaggedText, wcslen(TaggedText));
+            FillMemory(TaggedText,4096,NULL);
+            CNewFonts::ProcessTags(TaggedText, Text);
+            wchar_t* pText = TaggedText;
+            if (!bFull)
+            {
+                while (*pText && *pText != L' ')
+                    pText++;
+                *pText = L'\0';
+            }
+            return CNewFonts::m_aFonts[m_FontId].GetStringWidth(TaggedText);
         }
-        return CNewFonts::m_aFonts[m_FontId].GetStringWidth(taggedText);
+        else
+        {
+            char* pText = taggedText;
+            strncpy(text, str, strlen(str));
+            CNewFonts::ProcessTags(taggedText, text);
+            if (!bFull)
+            {
+                while (*pText && *pText != ' ')
+                    pText++;
+                *pText = '\0';
+            }
+            return CNewFonts::m_aFonts[m_FontId].GetStringWidth(taggedText);
+        }
     }
     else
         return CFont::GetStringWidth(str, bFull, bScriptText);
@@ -492,6 +711,24 @@ float CNewFont::GetStringWidth(char *str) {
     CNewFonts::m_pFontSprite->SetTransform(&S);
     CNewFonts::m_pFontSprite->Begin(0);
     this->m_pD3DXFont->DrawText(CNewFonts::m_pFontSprite, str, -1, &d3drect, DT_TOP | DT_NOCLIP | DT_SINGLELINE | DT_CALCRECT, 0xFFFFFFFF);
+    CNewFonts::m_pFontSprite->SetTransform(&P);
+    CNewFonts::m_pFontSprite->End();
+
+    // Values are enclosed between "(" and ")" to prevent the function from
+    // returning the wrong value...
+    return (((float)d3drect.right - (float)d3drect.left) * scale_x) / 2.0f;
+}
+
+float CNewFont::GetStringWidth(wchar_t *str) {
+    float scale_x = CFont::m_Scale->x * m_scaleX;
+    float scale_y = CFont::m_Scale->y * m_scaleY;
+    RECT d3drect; SetRect(&d3drect, 0, 0, 0, 0);
+    D3DXMATRIX S, P;
+    D3DXMatrixScaling(&S, scale_x / 2.0f, scale_y / 2.0f, 1.0f);
+    CNewFonts::m_pFontSprite->GetTransform(&P);
+    CNewFonts::m_pFontSprite->SetTransform(&S);
+    CNewFonts::m_pFontSprite->Begin(0);
+    this->m_pD3DXFont->DrawTextW(CNewFonts::m_pFontSprite, str, -1, &d3drect, DT_TOP | DT_NOCLIP | DT_SINGLELINE | DT_CALCRECT, 0xFFFFFFFF);
     CNewFonts::m_pFontSprite->SetTransform(&P);
     CNewFonts::m_pFontSprite->End();
 

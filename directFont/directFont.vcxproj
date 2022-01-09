@@ -111,21 +111,23 @@
     <ClCompile Include="translators\LatinTranslation.cpp" />
     <ClCompile Include="translators\SanLtdTranslation.cpp" />
     <ClCompile Include="translators\SAOriginalTranslation.cpp" />
+    <ClCompile Include="translators\WideCharSupport.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CD3DSprite.h" />
     <ClInclude Include="CNewFonts.h" />
     <ClInclude Include="translators\BaseTranslation.h" />
-    <ClInclude Include="translators\CustomCharMap.h" />
     <ClInclude Include="translators\CustomTranslator.h" />
     <ClInclude Include="translators\LatinTranslation.h" />
     <ClInclude Include="translators\SanLtdTranslation.h" />
     <ClInclude Include="translators\SAOriginalTranslation.h" />
+    <ClInclude Include="translators\WideCharSupport.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\copymod.bat" />
     <None Include="..\directFont.ini" />
-    <None Include="..\translations\Latin.ini" />
+    <None Include="..\Translations\Latin.ini" />
+    <None Include="..\Translations\test.ini" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

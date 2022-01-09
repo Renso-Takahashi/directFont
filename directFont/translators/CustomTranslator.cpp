@@ -10,117 +10,78 @@ cheat "fontconfig"...
 ################################################################*/
 
 #include "CustomTranslator.h"
-#include "CustomCharMap.h"
 #include <stdio.h>
 #include <plugin.h>
 
 using namespace plugin;
 
-static bool initialized[] = { false, false, false, false };
+char CustomTranslator::fontmap[4][208] = { 0 };
+bool CustomTranslator::initialized = false;
+const char CustomTranslator::FillMap[208] =
+{
+	'\x20','\x21','\x22','\x23','\x24','\x25','\x26','\x27','\x28','\x29','\x2A','\x2B','\x2C','\x2D','\x2E','\x2F',
+	'\x30','\x31','\x32','\x33','\x34','\x35','\x36','\x37','\x38','\x39','\x3A','\x3B','\x3C','\x3D','\x3E','\x3F',
+	'\x40','\x41','\x42','\x43','\x44','\x45','\x46','\x47','\x48','\x49','\x4A','\x4B','\x4C','\x4D','\x4E','\x4F',
+	'\x50','\x51','\x52','\x53','\x54','\x55','\x56','\x57','\x58','\x59','\x5A','\x5B','\x5C','\x5D','\x5E','\x5F',
+	'\x60','\x61','\x62','\x63','\x64','\x65','\x66','\x67','\x68','\x69','\x6A','\x6B','\x6C','\x6D','\x6E','\x6F',
+	'\x70','\x71','\x72','\x73','\x74','\x75','\x76','\x77','\x78','\x79','\x7A','\x7B','\x7C','\x7D','\x7E','\x7F',
+	'\xC0','\xC1','\xC2','\xC4','\xC6','\xC7','\xC8','\xC9','\xCA','\xCB','\xCC','\xCD','\xCE','\xCF','\xD2','\xD3',
+	'\xD4','\xD6','\xD9','\xDA','\xDB','\xDC','\xDF','\xE0','\xE1','\xE2','\xE4','\xE6','\xE7','\xE8','\xE9','\xEA',
+	'\xEB','\xEC','\xED','\xEE','\xEF','\xF2','\xF3','\xF4','\xF6','\xF9','\xFA','\xFB','\xFC','\xD1','\xF1','\xBF',
+	'\x30','\x31','\x32','\x33','\x34','\x35','\x36','\x37','\x38','\x39','\x20','\x41','\x42','\x43','\x44','\x45',
+	'\x46','\x47','\x48','\x49','\x4A','\x4B','\x4C','\x4D','\x4E','\x4F','\x50','\x51','\x52','\x53','\x54','\x55',
+	'\x56','\x57','\x58','\x59','\x5A','\xC0','\xC1','\xC2','\xC4','\xC6','\xC7','\xC8','\xC9','\xCA','\xCB','\xCC',
+	'\xCD','\xCE','\xCF','\xD2','\xD3','\xD4','\xD6','\xD9','\xDA','\xDB','\xDC','\xDF','\xD1','\xBF','\x27','\x2E'
+};
 
 // Initialize the custom translator
 bool CustomTranslator::Initialize(const char* filename)
 {
-	initialized[0] = false;
-	initialized[1] = false;
-	initialized[2] = false;
-	initialized[3] = false;
+	char inputfile[2048] = { 0 }, charname[10] = { 0 };
+	char chkval = 0;
 
-	static char filenm[65];
-	FillMemory(filenm, 65, 0);
+	sprintf(inputfile,"%sdirectFont\\Translations\\%s",paths::GetPluginDirPathA(),filename);
 
-	if(initialized[0])initialized[0] = false;
-	if(initialized[1])initialized[1] = false;
-	if(initialized[2])initialized[2] = false;
-	if(initialized[3])initialized[3] = false;
-
-	sprintf(filenm, "directFont\\Custom Maps\\%s0.wcm", filename);
-	initialized[0] = LoadMap(filenm, 0);
-
-	sprintf(filenm, "directFont\\Custom Maps\\%s1.wcm", filename);
-	initialized[1] = LoadMap(filenm, 1);
-
-	sprintf(filenm, "directFont\\Custom Maps\\%s2.wcm", filename);
-	initialized[2] = LoadMap(filenm, 2);
-
-	sprintf(filenm, "directFont\\Custom Maps\\%s3.wcm", filename);
-	initialized[3] = LoadMap(filenm, 3);
-
-	return ((initialized[0] || initialized[1] ||
-			 initialized[2] || initialized[3]) ? true : false);
-}
-
-// Load the translation files
-bool CustomTranslator::LoadMap(char* filename, char font)
-{
-	DWORD Header = 0, fSize = 0, CheckSum = 0, ChkSum = 0;
-	WORD offset = 0, size = 0;
-	unsigned char rbyte = 0, obyte = 0;
-	bool result = false;
-	FILE* CustomMap = NULL;
-
-	CustomMap = fopen(PLUGIN_PATH(filename), "rb");
-
-	if (CustomMap)
+	if (!FileExist(inputfile))
 	{
-		fseek(CustomMap, 0, SEEK_END);
-		fSize = ftell(CustomMap);
-		fseek(CustomMap, 0, SEEK_SET);
-
-		fread(&Header, 4, 1, CustomMap);
-		if (Header == 0x14D4357u || Header == 0x24D4357u ||
-			Header == 0x34D4357u || Header == 0x44D4357u)
-		{
-			fseek(CustomMap, (fSize - 4), SEEK_SET);
-			fread(&CheckSum, 4, 1, CustomMap);
-
-			fseek(CustomMap, 0, SEEK_SET);
-			for (size_t x = 0; x < (fSize - 5); x++)
-			{
-				fseek(CustomMap, x, SEEK_SET);
-				fread(&rbyte, 1, 1, CustomMap);
-				ChkSum += rbyte;
-			}
-
-			if (ChkSum == CheckSum) {
-
-				fseek(CustomMap, 0x09, SEEK_SET);
-				fread(&offset, 2, 1, CustomMap);
-				fseek(CustomMap, 0x0B, SEEK_SET);
-				fread(&size, 2, 1, CustomMap);
-
-				fseek(CustomMap, offset, SEEK_SET);
-
-				// FillMemory is not necessary in this case because
-				// Memcpy is used to fill the buffer with the
-				// original character map... 
-				
-				//FillMemory(fontmap[font], 208, 0);
-				memcpy(fontmap[font], FillMap, 208);
-
-				for (WORD x = 0; x < (size - 1); x++)
-				{
-					fseek(CustomMap, (offset + x), SEEK_SET);
-					fread(&obyte, 1, 1, CustomMap);
-					x++;
-					fseek(CustomMap, (offset + x), SEEK_SET);
-					fread(&rbyte, 1, 1, CustomMap);
-
-					if(rbyte > 0)
-						fontmap[font][obyte - 0x20] = rbyte;
-				}
-				result = true;
-
-			}
-			else {
-				Error("CustomTranslator::LoadMap\nCustom Font %d checksum missmatch.\nData = %d\nfile = %d", (font + 1) ,ChkSum ,CheckSum);
-				return false;
-			}
-		}
-		fclose(CustomMap);
+		Error("\"%s\" not found...",inputfile);
+		return false;
 	}
 
-	return result;
+	strncpy(fontmap[0],FillMap,208);
+	strncpy(fontmap[1],FillMap,208);
+	strncpy(fontmap[2],FillMap,208);
+	strncpy(fontmap[3],FillMap,208);
+
+	bool tst = false;
+
+	for (DWORD i = 0; i < 208; i++)
+	{
+		for (DWORD x = 0; x < 4; x++)
+		{
+			sprintf(charname,"%dx%02X",x,FillMap[i]);
+			chkval = GetPrivateProfileInt("Main",charname,NULL,inputfile);
+
+			if (chkval && FillMap[i] == fontmap[x][i])
+				fontmap[x][i] = chkval;
+		}
+	}
+
+	initialized = true;
+
+	return true;
+}
+
+bool CustomTranslator::FileExist(char* filename)
+{
+	FILE* ftemp = fopen(filename,"r+");
+
+	if(!ftemp)
+		return false;
+
+	fclose(ftemp);
+
+	return true;
 }
 
 // Translate the characters using the custom translator
@@ -130,7 +91,7 @@ bool CustomTranslator::LoadMap(char* filename, char font)
 // the characters 
 void CustomTranslator::TranslateString(char* str, int font)
 {
-	if (initialized[font])
+	if (initialized)
 	{
 		char *pText = str;
 		while (*pText) {
