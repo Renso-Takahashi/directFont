@@ -17,6 +17,7 @@ For now, these would be the changes from DK22Pak v2.2:
 - New custom translator: allows you to load a character set from a file. Each file has an individual character set for each font, allowing you to change characters from one font without altering that of the others...
 - New WIDE translator: Allows you to replace texts on the fly in addition to supporting UNICODE characters. With it you can bring the game to almost any language (for example Japanese or Chinese) just by editing a simple file
 - Fixed some problems with the subtitles which were not kept correctly aligned vertically (still need to correct them a bit...)
+- Added the **FONTCONFIG** cheat which allows you to reload the configuration file during the game without having to close it. The Windows notification sound will confirm the changes. It is not recommended to use it frequently in the same game as it can cause crashes!
 - Maybe some improvements soon...
 
 
@@ -24,8 +25,13 @@ For now, these would be the changes from DK22Pak v2.2:
 
 *Att.: Wyrdgirn*
 
-https://twitter.com/Wyrdgirn || https://www.gtainside.com/user/Wyrdgirn
+**My twitter**
+https://twitter.com/Wyrdgirn
 
+**You find the latest stable version in**
+
+**You can find the mod also in my GTAInside profile**
+https://www.gtainside.com/en/sanandreas/mods/167979-directfont-full-latin-support/
 
 **You can find the original source code at**
 https://github.com/DK22Pac/directFont
