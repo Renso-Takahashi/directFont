@@ -68,12 +68,6 @@
       <GenerateDebugInformation>Debug</GenerateDebugInformation>
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
-    <PostBuildEvent>
-      <Command>"$(SolutionDir)copymod.bat"</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message>Copying mod to the GTASA folder...</Message>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Rel|Win32'">
     <ClCompile>
@@ -95,22 +89,14 @@
       <AdditionalDependencies>d3dx9.lib;d3d9.lib;plugin.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
-    <PostBuildEvent>
-      <Command>"$(SolutionDir)copymod.bat"</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message>Copying mod to the GTASA folder...</Message>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CD3DSprite.cpp" />
-    <ClCompile Include="CFontMenu.cpp" />
     <ClCompile Include="CNewFonts.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="translators\CustomTranslator.cpp" />
     <ClCompile Include="translators\LatinTranslation.cpp" />
     <ClCompile Include="translators\SanLtdTranslation.cpp" />
-    <ClCompile Include="translators\SAOriginalTranslation.cpp" />
     <ClCompile Include="translators\WideCharSupport.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -120,11 +106,9 @@
     <ClInclude Include="translators\CustomTranslator.h" />
     <ClInclude Include="translators\LatinTranslation.h" />
     <ClInclude Include="translators\SanLtdTranslation.h" />
-    <ClInclude Include="translators\SAOriginalTranslation.h" />
     <ClInclude Include="translators\WideCharSupport.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\copymod.bat" />
     <None Include="..\directFont.ini" />
     <None Include="..\Translations\Latin.ini" />
     <None Include="..\Translations\test.ini" />

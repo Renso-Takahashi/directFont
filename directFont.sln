@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.30523.141
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "directFont", "directFont\directFont.vcxproj", "{FF630438-A5EA-4612-A843-77CB56888722}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Wyrdgirn_Tool", "Wyrdgirn_Tool\Wyrdgirn_Tool.vcxproj", "{205CD71D-7985-43C0-9781-C3B2007B56D3}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Dbg|x86 = Dbg|x86
@@ -17,10 +15,6 @@ Global
 		{FF630438-A5EA-4612-A843-77CB56888722}.Dbg|x86.Build.0 = Dbg|Win32
 		{FF630438-A5EA-4612-A843-77CB56888722}.Rel|x86.ActiveCfg = Rel|Win32
 		{FF630438-A5EA-4612-A843-77CB56888722}.Rel|x86.Build.0 = Rel|Win32
-		{205CD71D-7985-43C0-9781-C3B2007B56D3}.Dbg|x86.ActiveCfg = Dbg|Win32
-		{205CD71D-7985-43C0-9781-C3B2007B56D3}.Dbg|x86.Build.0 = Dbg|Win32
-		{205CD71D-7985-43C0-9781-C3B2007B56D3}.Rel|x86.ActiveCfg = Rel|Win32
-		{205CD71D-7985-43C0-9781-C3B2007B56D3}.Rel|x86.Build.0 = Rel|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

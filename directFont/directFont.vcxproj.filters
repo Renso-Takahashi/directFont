@@ -10,13 +10,7 @@
     <ClCompile Include="translators\SanLtdTranslation.cpp">
       <Filter>translators</Filter>
     </ClCompile>
-    <ClCompile Include="translators\SAOriginalTranslation.cpp">
-      <Filter>translators</Filter>
-    </ClCompile>
     <ClCompile Include="CD3DSprite.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="CFontMenu.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="CNewFonts.cpp">
@@ -42,9 +36,6 @@
     <ClInclude Include="translators\SanLtdTranslation.h">
       <Filter>translators</Filter>
     </ClInclude>
-    <ClInclude Include="translators\SAOriginalTranslation.h">
-      <Filter>translators</Filter>
-    </ClInclude>
     <ClInclude Include="CD3DSprite.h">
       <Filter>Source</Filter>
     </ClInclude>
@@ -68,7 +59,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\directFont.ini" />
-    <None Include="..\copymod.bat" />
     <None Include="..\Translations\Latin.ini">
       <Filter>translations</Filter>
     </None>

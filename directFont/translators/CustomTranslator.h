@@ -1,3 +1,4 @@
+// Custom translator by Wyrdgirn
 #pragma once
 
 #include "BaseTranslation.h"

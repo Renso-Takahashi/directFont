@@ -4,8 +4,7 @@ In this file are the functions that I have created to load custom
 translators without having to recompile the mod, it can be used both
 for common use and to correct characters easily.
 
-You can edit the files and reload them in-game using the
-cheat "fontconfig"...
+- Wyrdgirn
 
 ################################################################*/
 
@@ -55,15 +54,15 @@ bool CustomTranslator::Initialize(const char* filename)
 
 	bool tst = false;
 
-	for (DWORD i = 0; i < 208; i++)
+	for (DWORD i = 0; i < 4; i++)
 	{
-		for (DWORD x = 0; x < 4; x++)
+		for (DWORD x = 0; x < 208; x++)
 		{
-			sprintf(charname,"%dx%02X",x,FillMap[i]);
+			sprintf(charname,"%dx%02X",i,FillMap[x]);
 			chkval = GetPrivateProfileInt("Main",charname,NULL,inputfile);
 
-			if (chkval && FillMap[i] == fontmap[x][i])
-				fontmap[x][i] = chkval;
+			if (chkval && FillMap[x] == fontmap[i][x])
+				fontmap[i][x] = chkval;
 		}
 	}
 
@@ -87,8 +86,7 @@ bool CustomTranslator::FileExist(char* filename)
 // Translate the characters using the custom translator
 //
 // Yes, I know that it is a bit long but it is the method
-// that works best, the traditional one does not replace
-// the characters 
+// that works best, the short does nothing :'(
 void CustomTranslator::TranslateString(char* str, int font)
 {
 	if (initialized)

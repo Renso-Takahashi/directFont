@@ -1,3 +1,4 @@
+// Wyrdgirn: I don't remember if I edit this file...
 #include "LatinTranslation.h"
 
 void LatinTranslation::TranslateString(char *str) {

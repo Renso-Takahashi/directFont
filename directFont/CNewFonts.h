@@ -1,3 +1,4 @@
+// Modified by Wyrdgirn
 #pragma once
 #include "d3dx9.h"
 #include "CRect.h"

@@ -1,17 +1,24 @@
+// WideSupport by Wyrdgirn
 #include "WideCharSupport.h"
 #include "CustomTranslator.h"
+#include "CMessages.h"
 #include <stdio.h>
 #include <plugin.h>
 
 using namespace plugin;
 
-// Mmmmm... Maybe dynamics allocations works but...
-// I'm like static alloc better :3
-char WideSupport::tBuff[8192][2048] = { 0 };
-DWORD WideSupport::iBuff[8192] = { 0 };
+// String Structure
+typedef struct
+{
+	char oBuff[2048]; // Original text buffer
+	wchar_t rBuff[2048]; // Replaced text buffer
+}char_buff;
+
+// String Buffer
+char_buff *tBuff = NULL;
 
 // Strings count
-size_t WideSupport::cBuff = 0;
+size_t strcount = 0;
 
 bool WideSupport::initialized = false;
 
@@ -19,7 +26,7 @@ bool WideSupport::initialized = false;
 bool WideSupport::Initialize(char *filename) 
 {
 	char inputfile[2048] = { 0 },
-		privkey[10] = { 0 },
+		privkey[20] = { 0 },
 		privapp[20] = { 0 };
 
 	sprintf(inputfile,"%sdirectFont\\Translations\\%s",paths::GetPluginDirPathA(),filename);
@@ -32,67 +39,86 @@ bool WideSupport::Initialize(char *filename)
 
 	DWORD textcount = GetPrivateProfileInt("General","Count",NULL,inputfile);
 
-	cBuff = 0;
+	tBuff = (char_buff*)malloc(sizeof(char_buff) * textcount);
+
+	strcount = 0;
 
 	for (DWORD i = 0; i < textcount; i++)
 	{
+		FillMemory(tBuff[strcount].oBuff,2048,0);
+		FillMemory(tBuff[strcount].rBuff,4096,0);
 
-		FillMemory(tBuff[i],2048,0);
+		sprintf(privapp,"str%d",i);
+		GetPrivateProfileString(privapp,"GameString",NULL,tBuff[strcount].oBuff,2048,inputfile);
 
-		sprintf(privapp,"wchar%d",i);
-		iBuff[i] = GetPrivateProfileInt(privapp,"TextID",NULL,inputfile);
+		if (tBuff[strcount].oBuff)
+		{
+			char textbuff[4096] = { 0 };
+			GetPrivateProfileString(privapp, "WideString", NULL, textbuff, 2048, inputfile);
+			int WideSize = MultiByteToWideChar(CP_UTF8,0,textbuff,strlen(textbuff),NULL,0);
+			MultiByteToWideChar(CP_UTF8,0,textbuff,strlen(textbuff),tBuff[strcount].rBuff,WideSize);
+		} else break;
 
-		if(iBuff[i])
-			GetPrivateProfileString(privapp,"WideString",NULL,tBuff[i],2048,inputfile);
-
-		if(!tBuff)
+		if(!tBuff[strcount].rBuff && i > 0)
 			break;
-
-		cBuff++;
+		else if(tBuff[strcount].rBuff)
+			strcount++;
 	}
 
-	if(cBuff)
+	if(strcount)
 		initialized = true;
 
 	return initialized;
 }
 
-// Get a unique ID from input text...
-DWORD WideSupport::GetTextID(char* text, size_t size)
+bool WideSupport::Translate(char *intext, wchar_t* outtext)
 {
-	DWORD RetVal = 0;
-
-	for (size_t i = 0; i < size; i++)
-	{
-		RetVal += (text[i] + i);
-	}
-
-	return RetVal;
-}
-
-bool WideSupport::Translate(DWORD TextID, wchar_t* outtext)
-{
-	static wchar_t pBuff[2048] = { 0 };
 	int WideSize = 0;
-
-	FillMemory(pBuff,4096,0);
 
 	if (initialized)
 	{
-		for (DWORD i = 0; i < cBuff; i++)
+		for (DWORD i = 0; i < strcount; i++)
 		{
-			if (iBuff[i] == TextID)
+			if (!strncmp(intext,tBuff[i].oBuff,strlen(tBuff[i].oBuff)))
 			{
-				if(!tBuff[i])
+				if(!tBuff[i].rBuff)
 					break;
-
-				WideSize = MultiByteToWideChar(CP_UTF8,0,tBuff[i],strlen(tBuff[i]),NULL,0);
-				MultiByteToWideChar(CP_UTF8,0,tBuff[i],strlen(tBuff[i]),pBuff,WideSize);
-
-				memcpy(outtext,pBuff,(wcslen(pBuff) * 2));
+				memcpy(outtext,tBuff[i].rBuff,wcslen(tBuff[i].rBuff)*2);
 				return true;
 			}
 		}
 	}
 	return false;
+}
+
+void WideSupport::InsertPlayerControlKeysInString(wchar_t *text)
+{
+	size_t textlen = wcslen(text);
+	char mbtext[2048] = { 0 };
+	wchar_t wctext[2048] = { 0 }, fwctext[2048] = { 0 };
+	for (size_t i = 0; i < textlen; i++)
+	{
+		if (!wcsncmp(&text[i], L"~k~~", 4) || !wcsncmp(&text[i], L"~K~~", 4))
+		{
+			for (size_t x = 4; x < (textlen - i); x++)
+			{
+				if (text[i + x] == '~')
+				{
+					wcsncpy(wctext, &text[i], x+1);
+					bool usedeftext = false;
+					int charsize = WideCharToMultiByte(CP_UTF8,0,wctext,wcslen(wctext),NULL,0,NULL,NULL);
+					WideCharToMultiByte(CP_UTF8,0,wctext,wcslen(wctext),mbtext,charsize,NULL,NULL);
+					CMessages::InsertPlayerControlKeysInString(mbtext);
+					FillMemory(wctext,2048,0);
+					charsize = MultiByteToWideChar(CP_UTF8,0,mbtext,strlen(mbtext),NULL,0);
+					MultiByteToWideChar(CP_UTF8,0,mbtext,strlen(mbtext),wctext,charsize);
+					wcsncpy(fwctext,text,i+1);
+					wcsncpy(&fwctext[i],wctext,charsize);
+					wcsncpy(&fwctext[i+charsize],&text[i+x+1],(textlen-(i+x)));
+					FillMemory(text,wcslen(text),0);
+					wcsncpy(text,fwctext,wcslen(fwctext));
+				}
+			}
+		}
+	}
 }

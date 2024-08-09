@@ -1,4 +1,4 @@
-// It is not used but I have put it "just in case"
+// Wyrdgirn: It is not used but I have put it "just in case"
 
 #include "SAOriginalTranslation.h"
 

@@ -6,6 +6,8 @@
  I cannot say if it is effective but I suppose it will have
  some impact on the precision with which the texts are
  displayed, positioned and/or scaled...
+ 
+- Wyrdgirn
 
 ################################################################*/
 
@@ -18,7 +20,6 @@
 #include "translators\LatinTranslation.h"
 #include "translators\CustomTranslator.h"
 #include "translators\SanLtdTranslation.h"
-#include "translators\SAOriginalTranslation.h"
 #include <stdio.h>
 
 using namespace plugin;
@@ -314,7 +315,7 @@ void CNewFonts::Initialise() {
         WideSupport tr;
         if (!tr.Initialize(transln)) {
             Error("CNewFonts::Initialise\nCan't load the WideChar Translator.");
-            m_Translation = eTranslation::TRANSLATION_NONE;
+            //m_Translation = eTranslation::TRANSLATION_NONE;
         }
     }
 
@@ -325,7 +326,7 @@ void CNewFonts::Initialise() {
     m_pFontSprite = new CD3DSprite;
 
     _Running = true;
-    CreateThread(NULL,NULL,CNewFonts::FontMenu,NULL,NULL,NULL);
+    //CreateThread(NULL,NULL,CNewFonts::FontMenu,NULL,NULL,NULL);
 }
 
 void CNewFonts::Reset() {
@@ -370,11 +371,29 @@ void _UpCase(char *str) {
     }
 }
 
+void _UpCase(wchar_t *str) {
+    wchar_t *pStr = str;
+    while (*pStr) {
+        if ((*pStr >= L'\x61' && *pStr <= L'\x7A'))
+            *pStr -= 0x20;
+        pStr++;
+    }
+}
+
 void ReplaceUsWithSpace(unsigned char *str) {
     unsigned char *pStr = str;
     while (*pStr) {
         if (*pStr == '\x5F')
             *pStr = ' ';
+        pStr++;
+    }
+}
+
+void ReplaceUsWithSpace(wchar_t *str) {
+    wchar_t *pStr = str;
+    while (*pStr) {
+        if (*pStr == L'\x5F')
+            *pStr = L' ';
         pStr++;
     }
 }
@@ -414,9 +433,13 @@ void CNewFonts::PrintString(float x, float y, char *text) {
         WideSupport ws;
 
         if (ws.initialized &&
-            ws.Translate(ws.GetTextID(text, strlen(text)),Text))
+            ws.Translate(text,Text))
         {
             ProcessTags(TaggedText, Text);
+            if (m_aFonts[m_FontId].m_upperCase)
+                _UpCase((wchar_t*)TaggedText);
+            if (m_aFonts[m_FontId].m_replaceUS)
+                ReplaceUsWithSpace((wchar_t*)TaggedText);
             m_aFonts[m_FontId].PrintString(TaggedText, *rect, CFont::m_Scale->x * m_aFonts[m_FontId].m_scaleX,
                 CFont::m_Scale->y * m_aFonts[m_FontId].m_scaleY, *CFont::m_Color,
                 DT_TOP | DT_NOCLIP | DT_WORDBREAK | flag, CFont::m_bFontBackground ? CFont::m_FontBackgroundColor : NULL,
@@ -565,11 +588,12 @@ void CNewFonts::ProcessTags(wchar_t *dest, wchar_t *src) {
     static wchar_t text[MAX_TEXT_SIZE] = { 0 };
 
     // You will already know the reason for the FillMemory
-    // if you saw my other comment :P
+    // if you saw my other comments :P
 
     FillMemory(text, MAX_TEXT_SIZE, 0);
 
     wcsncpy_s(text, src, wcslen(src));
+    WideSupport::InsertPlayerControlKeysInString(text);
 
     wchar_t *outText = dest;
     CRGBA currColor(*CFont::m_Color);
@@ -669,7 +693,7 @@ float CNewFonts::GetStringWidth(char *str, char bFull, char bScriptText) {
         WideSupport ws;
 
         if (ws.initialized &&
-            ws.Translate(ws.GetTextID(str, strlen(str)), TaggedText))
+            ws.Translate(str, TaggedText))
         {
             wcsncpy(Text, TaggedText, wcslen(TaggedText));
             FillMemory(TaggedText,4096,NULL);
