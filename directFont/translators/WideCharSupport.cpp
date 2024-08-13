@@ -39,7 +39,7 @@ bool WideSupport::Initialize(char *filename)
 
 	DWORD textcount = GetPrivateProfileInt("General","Count",NULL,inputfile);
 
-	tBuff = (char_buff*)malloc(sizeof(char_buff) * textcount);
+	tBuff = (char_buff*)calloc(textcount,sizeof(char_buff));
 
 	strcount = 0;
 
@@ -73,18 +73,22 @@ bool WideSupport::Initialize(char *filename)
 
 bool WideSupport::Translate(char *intext, wchar_t* outtext)
 {
-	int WideSize = 0;
+	size_t CharSize = 0, OrigSize = 0, WideSize = 0;
 
 	if (initialized)
 	{
 		for (DWORD i = 0; i < strcount; i++)
 		{
-			if (!strncmp(intext,tBuff[i].oBuff,strlen(tBuff[i].oBuff)))
+			CharSize = strlen(tBuff[i].oBuff);
+			OrigSize = strlen(intext);
+			WideSize = wcslen(tBuff[i].rBuff);
+			if ((CharSize == OrigSize) && !strncmp(intext,tBuff[i].oBuff,CharSize))
 			{
 				if(!tBuff[i].rBuff)
 					break;
-				memcpy(outtext,tBuff[i].rBuff,wcslen(tBuff[i].rBuff)*2);
-				return true;
+				memcpy(outtext,tBuff[i].rBuff,WideSize*2);
+				outtext[WideSize] = L'\0';
+				return !wcsncmp(outtext,tBuff[i].rBuff,WideSize);
 			}
 		}
 	}

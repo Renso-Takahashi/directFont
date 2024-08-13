@@ -47,6 +47,7 @@ public:
     void OnReset();
     float GetStringWidth(char *str);
     float GetStringWidth(wchar_t *str);
+    float GetStringWidthHeight(wchar_t *str, float &height);
 };
 
 class CNewFonts {
@@ -69,6 +70,4 @@ public:
     static void ProcessTags(char *dest, char *src);
     static void ProcessTags(wchar_t *dest, wchar_t *src);
     static float GetStringWidth(char *str, char bFull, char bScriptText);
-
-    static DWORD WINAPI FontMenu(void* parameter);
 };

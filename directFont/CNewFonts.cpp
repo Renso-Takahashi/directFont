@@ -32,6 +32,7 @@ eFontStyle CNewFonts::m_FontId;
 CRGBA CNewFonts::gLetterColors[MAX_TEXT_SIZE];
 unsigned int CNewFonts::gNumLetters;
 bool CNewFonts::gShadow;
+bool CNewFonts::_Running;
 static char transln[50];
 
 bool CNewFont::SetupFont(char *fontName, unsigned int width, int height, float scaleX, float scaleY, unsigned int weight, bool italic,
@@ -326,7 +327,6 @@ void CNewFonts::Initialise() {
     m_pFontSprite = new CD3DSprite;
 
     _Running = true;
-    //CreateThread(NULL,NULL,CNewFonts::FontMenu,NULL,NULL,NULL);
 }
 
 void CNewFonts::Reset() {
@@ -398,22 +398,36 @@ void ReplaceUsWithSpace(wchar_t *str) {
     }
 }
 
+size_t GetLineCount(char* str)
+{
+    size_t count = 1;
+    for (size_t i = 0; i < strlen(str); i++)
+    {
+        if(str[i] == '\n') count++;
+    }
+    return count;
+}
+
+size_t GetLineCount(wchar_t* str)
+{
+    size_t count = 1;
+    for (size_t i = 0; i < wcslen(str); i++)
+    {
+        if(str[i] == L'\n') count++;
+    }
+    return count;
+}
+
 void CNewFonts::PrintString(float x, float y, char *text) {
     if (m_aFonts[m_FontId].m_initialised) {
         static char taggedText[MAX_TEXT_SIZE] = { 0 };
         static wchar_t Text[MAX_TEXT_SIZE] = { 0 };
         static wchar_t TaggedText[MAX_TEXT_SIZE] = { 0 };
 
-        // FillMemory fills the variable with zeros, preventing GetStringWidth()
-        // from detecting old text fragments and causing text alignment problems
-        // when returning a larger value
-        // (Visible in the subtitles where there are texts that appear higher even
-        // having only one line ...) 
-
         // Temporary Disabled...
-        FillMemory(taggedText, MAX_TEXT_SIZE, 0);
+        /*FillMemory(taggedText, MAX_TEXT_SIZE, 0);
         FillMemory(TaggedText, 4096, 0);
-        FillMemory(Text, 4096, 0);
+        FillMemory(Text, 4096, 0);*/
 
         CRect *rect;
         unsigned int flag;
@@ -436,10 +450,24 @@ void CNewFonts::PrintString(float x, float y, char *text) {
             ws.Translate(text,Text))
         {
             ProcessTags(TaggedText, Text);
+            ProcessTags(taggedText, text);
             if (m_aFonts[m_FontId].m_upperCase)
                 _UpCase((wchar_t*)TaggedText);
             if (m_aFonts[m_FontId].m_replaceUS)
                 ReplaceUsWithSpace((wchar_t*)TaggedText);
+
+            if (GetLineCount(taggedText) < GetLineCount(TaggedText))
+            {
+                float wideheight;
+                m_aFonts[m_FontId].GetStringWidthHeight(TaggedText, wideheight);
+                rect->top += wideheight;
+            } else if (GetLineCount(taggedText) > GetLineCount(TaggedText))
+            {
+                float wideheight;
+                m_aFonts[m_FontId].GetStringWidthHeight(TaggedText, wideheight);
+                rect->top -= wideheight;
+            }
+
             m_aFonts[m_FontId].PrintString(TaggedText, *rect, CFont::m_Scale->x * m_aFonts[m_FontId].m_scaleX,
                 CFont::m_Scale->y * m_aFonts[m_FontId].m_scaleY, *CFont::m_Color,
                 DT_TOP | DT_NOCLIP | DT_WORDBREAK | flag, CFont::m_bFontBackground ? CFont::m_FontBackgroundColor : NULL,
@@ -685,10 +713,10 @@ float CNewFonts::GetStringWidth(char *str, char bFull, char bScriptText) {
         static wchar_t Text[MAX_TEXT_SIZE] = { 0 };
         static wchar_t TaggedText[MAX_TEXT_SIZE] = { 0 };
 
-        FillMemory(text, MAX_TEXT_SIZE, 0);
+        /*FillMemory(text, MAX_TEXT_SIZE, 0);
         FillMemory(taggedText, MAX_TEXT_SIZE, 0);
         FillMemory(Text, 4096, 0);
-        FillMemory(TaggedText, 4096, 0);
+        FillMemory(TaggedText, 4096, 0);*/
 
         WideSupport ws;
 
@@ -743,7 +771,7 @@ float CNewFont::GetStringWidth(char *str) {
     return (((float)d3drect.right - (float)d3drect.left) * scale_x) / 2.0f;
 }
 
-float CNewFont::GetStringWidth(wchar_t *str) {
+float CNewFont::GetStringWidthHeight(wchar_t *str, float &height) {
     float scale_x = CFont::m_Scale->x * m_scaleX;
     float scale_y = CFont::m_Scale->y * m_scaleY;
     RECT d3drect; SetRect(&d3drect, 0, 0, 0, 0);
@@ -758,7 +786,13 @@ float CNewFont::GetStringWidth(wchar_t *str) {
 
     // Values are enclosed between "(" and ")" to prevent the function from
     // returning the wrong value...
+    height = (((float)d3drect.top - (float)d3drect.bottom) * scale_y) / 2.0f;
     return (((float)d3drect.right - (float)d3drect.left) * scale_x) / 2.0f;
+}
+
+float CNewFont::GetStringWidth(wchar_t* str) {
+    float Height;
+    return GetStringWidthHeight(str,Height);
 }
 
 void CNewFonts::SetFontStyle(eFontStyle style) {
