@@ -77,7 +77,7 @@ bool WideSupport::Translate(char *intext, wchar_t* outtext)
 
 	if (initialized)
 	{
-		for (DWORD i = 0; i < strcount; i++)
+		for (size_t i = 0; i < strcount; i++)
 		{
 			CharSize = strlen(tBuff[i].oBuff);
 			OrigSize = strlen(intext);
@@ -95,7 +95,7 @@ bool WideSupport::Translate(char *intext, wchar_t* outtext)
 	return false;
 }
 
-void WideSupport::InsertPlayerControlKeysInString(wchar_t *text)
+void WideSupport::InsertPlayerControlKeysInString(wchar_t *text, size_t size)
 {
 	size_t textlen = wcslen(text);
 	char mbtext[2048] = { 0 };
@@ -108,7 +108,7 @@ void WideSupport::InsertPlayerControlKeysInString(wchar_t *text)
 			{
 				if (text[i + x] == '~')
 				{
-					wcsncpy(wctext, &text[i], x+1);
+					memcpy_s(wctext, 2048, &text[i], x+1);
 					bool usedeftext = false;
 					int charsize = WideCharToMultiByte(CP_UTF8,0,wctext,wcslen(wctext),NULL,0,NULL,NULL);
 					WideCharToMultiByte(CP_UTF8,0,wctext,wcslen(wctext),mbtext,charsize,NULL,NULL);
@@ -116,11 +116,11 @@ void WideSupport::InsertPlayerControlKeysInString(wchar_t *text)
 					FillMemory(wctext,2048,0);
 					charsize = MultiByteToWideChar(CP_UTF8,0,mbtext,strlen(mbtext),NULL,0);
 					MultiByteToWideChar(CP_UTF8,0,mbtext,strlen(mbtext),wctext,charsize);
-					wcsncpy(fwctext,text,i+1);
-					wcsncpy(&fwctext[i],wctext,charsize);
-					wcsncpy(&fwctext[i+charsize],&text[i+x+1],(textlen-(i+x)));
+					memcpy_s(fwctext, 2048,text,i+1);
+					memcpy_s(&fwctext[i],(2048-i),wctext,charsize);
+					memcpy_s(&fwctext[i+charsize],(2048-(i+charsize)),&text[(i+x)+1],(textlen-(i+x)));
 					FillMemory(text,wcslen(text),0);
-					wcsncpy(text,fwctext,wcslen(fwctext));
+					memcpy_s(text,size,fwctext,wcslen(fwctext));
 				}
 			}
 		}

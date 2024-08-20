@@ -111,6 +111,7 @@
     <ClInclude Include="translators\WideCharSupport.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\copymod.bat" />
     <None Include="..\directFont.ini" />
     <None Include="..\Translations\Latin.ini" />
     <None Include="..\Translations\test.ini" />

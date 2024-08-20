@@ -47,7 +47,7 @@ public:
     void OnReset();
     float GetStringWidth(char *str);
     float GetStringWidth(wchar_t *str);
-    float GetStringWidthHeight(wchar_t *str, float &height);
+    float GetStringWidthHeight(wchar_t *str, float *height);
 };
 
 class CNewFonts {

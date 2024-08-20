@@ -8,6 +8,6 @@ class WideSupport
 public:
 	static bool Initialize(char *filename);
 	static bool Translate(char *intext, wchar_t *outtext);
-	static void InsertPlayerControlKeysInString(wchar_t *text);
+	static void InsertPlayerControlKeysInString(wchar_t *text, size_t size);
 	static bool initialized;
 };

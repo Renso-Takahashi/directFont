@@ -11,6 +11,8 @@
 
 ################################################################*/
 
+#pragma warning(disable: 6031) // Disable sscanf warning
+
 #include "CNewFonts.h"
 #include "plugin.h"
 #include "CSprite2d.h"
@@ -232,10 +234,11 @@ void CNewFonts::Initialise() {
     int width;
     float scaleX, scaleY;
     bool italic, upperCase,replaceUS;
+    char inipath[] = "directFont\\directFont.ini";
 
     for (int i = 0; i < MAX_NUM_FONTS; i++) {
         wsprintf(app, "FONT%d", i + 1);
-        GetPrivateProfileString(app, "FontName", "USE_DEFAULT", fontName, 256, PLUGIN_PATH("directFont\\directFont.ini"));
+        GetPrivateProfileString(app, "FontName", "USE_DEFAULT", fontName, 256, PLUGIN_PATH(inipath));
         if (!strcmp(fontName, "USE_DEFAULT")) {
             m_aFonts[i].m_initialised = false;
             continue;
@@ -263,27 +266,27 @@ void CNewFonts::Initialise() {
                 m_aFonts[fontId].m_replaceUS);
         }
         else {
-            height = GetPrivateProfileInt(app, "Height", 64, PLUGIN_PATH("directFont\\directFont.ini"));
-            width = GetPrivateProfileInt(app, "Width", 40, PLUGIN_PATH("directFont\\directFont.ini"));
-            GetPrivateProfileString(app, "ScaleFactor.x", "0.6", scaleFactorStr, 16, PLUGIN_PATH("directFont\\directFont.ini"));
+            height = GetPrivateProfileInt(app, "Height", 64, PLUGIN_PATH(inipath));
+            width = GetPrivateProfileInt(app, "Width", 40, PLUGIN_PATH(inipath));
+            GetPrivateProfileString(app, "ScaleFactor.x", "0.6", scaleFactorStr, 16, PLUGIN_PATH(inipath));
             sscanf(scaleFactorStr, "%f", &scaleX);
-            GetPrivateProfileString(app, "ScaleFactor.y", "0.4", scaleFactorStr, 16, PLUGIN_PATH("directFont\\directFont.ini"));
+            GetPrivateProfileString(app, "ScaleFactor.y", "0.4", scaleFactorStr, 16, PLUGIN_PATH(inipath));
             sscanf(scaleFactorStr, "%f", &scaleY);
-            weight = GetPrivateProfileInt(app, "Weight", 500, PLUGIN_PATH("directFont\\directFont.ini"));
-            italic = GetPrivateProfileInt(app, "Italic", 0, PLUGIN_PATH("directFont\\directFont.ini"));
-            charSet = GetPrivateProfileInt(app, "CharSet", 1, PLUGIN_PATH("directFont\\directFont.ini"));
-            outputPrecision = GetPrivateProfileInt(app, "OutputPrecision", 0, PLUGIN_PATH("directFont\\directFont.ini"));
-            quality = GetPrivateProfileInt(app, "Quality", 0, PLUGIN_PATH("directFont\\directFont.ini"));
-            pitchAndFamily = GetPrivateProfileInt(app, "PitchAndFamily", 0, PLUGIN_PATH("directFont\\directFont.ini"));
-            upperCase = GetPrivateProfileInt(app, "UpcaseAlways", 0, PLUGIN_PATH("directFont\\directFont.ini"));
-            replaceUS = GetPrivateProfileInt(app, "ReplaceUnderscoreWithSpace", 0, PLUGIN_PATH("directFont\\directFont.ini"));
+            weight = GetPrivateProfileInt(app, "Weight", 500, PLUGIN_PATH(inipath));
+            italic = GetPrivateProfileInt(app, "Italic", 0, PLUGIN_PATH(inipath));
+            charSet = GetPrivateProfileInt(app, "CharSet", 1, PLUGIN_PATH(inipath));
+            outputPrecision = GetPrivateProfileInt(app, "OutputPrecision", 0, PLUGIN_PATH(inipath));
+            quality = GetPrivateProfileInt(app, "Quality", 0, PLUGIN_PATH(inipath));
+            pitchAndFamily = GetPrivateProfileInt(app, "PitchAndFamily", 0, PLUGIN_PATH(inipath));
+            upperCase = GetPrivateProfileInt(app, "UpcaseAlways", 0, PLUGIN_PATH(inipath));
+            replaceUS = GetPrivateProfileInt(app, "ReplaceUnderscoreWithSpace", 0, PLUGIN_PATH(inipath));
             m_aFonts[i].SetupFont(fontName, width, height, scaleX, scaleY, weight, italic, charSet, outputPrecision, quality, pitchAndFamily,
                 upperCase, replaceUS);
         }
     }
 
     // Added the Custom Translator
-    GetPrivateProfileString("GENERAL", "UseTranslator", "NONE", translation, 16, PLUGIN_PATH("directFont\\directFont.ini"));
+    GetPrivateProfileString("GENERAL", "UseTranslator", "NONE", translation, 16, PLUGIN_PATH(inipath));
     if (!strncmp(translation, "NONE", 5))
         m_Translation = eTranslation::TRANSLATION_NONE;
     else if (!strncmp(translation, "SANLTD", 7))
@@ -300,7 +303,7 @@ void CNewFonts::Initialise() {
     // Load the custom translator
     if (m_Translation == eTranslation::TRANSLATION_CUSTOM)
     {
-        GetPrivateProfileString("GENERAL", "CustomTranslation", "NONE", transln, 50, PLUGIN_PATH("directFont\\directFont.ini"));
+        GetPrivateProfileString("GENERAL", "CustomTranslation", "NONE", transln, 50, PLUGIN_PATH(inipath));
         transln[strlen(transln)] = '\0';
         CustomTranslator tr;
         if (!tr.Initialize(transln)) {
@@ -309,9 +312,9 @@ void CNewFonts::Initialise() {
         }
     }
 
-    if (GetPrivateProfileInt("GENERAL","UseWideCharTranslator",0,PLUGIN_PATH("directFont\\directFont.ini")) > 0)
+    if (GetPrivateProfileInt("GENERAL","UseWideCharTranslator",0,PLUGIN_PATH(inipath)) > 0)
     {
-        GetPrivateProfileString("GENERAL", "WideTranslation", "NONE", transln, 50, PLUGIN_PATH("directFont\\directFont.ini"));
+        GetPrivateProfileString("GENERAL", "WideTranslation", "NONE", transln, 50, PLUGIN_PATH(inipath));
         transln[strlen(transln)] = '\0';
         WideSupport tr;
         if (!tr.Initialize(transln)) {
@@ -432,15 +435,15 @@ void CNewFonts::PrintString(float x, float y, char *text) {
         CRect *rect;
         unsigned int flag;
         if (CFont::m_bFontCentreAlign) {
-            rect = &CRect(x - CFont::m_fFontCentreSize / 2.0f, y, x + CFont::m_fFontCentreSize / 2.0f, SCREEN_HEIGHT);
+            rect = new CRect(x - CFont::m_fFontCentreSize / 2.0f, y, x + CFont::m_fFontCentreSize / 2.0f, SCREEN_HEIGHT);
             flag = DT_CENTER;
         }
         else if (CFont::m_bFontRightAlign) {
-            rect = &CRect(CFont::m_fRightJustifyWrap, y, x, SCREEN_HEIGHT);
+            rect = new CRect(CFont::m_fRightJustifyWrap, y, x, SCREEN_HEIGHT);
             flag = DT_RIGHT;
         }
         else {
-            rect = &CRect(x, y, CFont::m_fWrapx, SCREEN_HEIGHT);
+            rect = new CRect(x, y, CFont::m_fWrapx, SCREEN_HEIGHT);
             flag = DT_LEFT;
         }
 
@@ -456,15 +459,14 @@ void CNewFonts::PrintString(float x, float y, char *text) {
             if (m_aFonts[m_FontId].m_replaceUS)
                 ReplaceUsWithSpace((wchar_t*)TaggedText);
 
+            float wideheight;
             if (GetLineCount(taggedText) < GetLineCount(TaggedText))
             {
-                float wideheight;
-                m_aFonts[m_FontId].GetStringWidthHeight(TaggedText, wideheight);
+                m_aFonts[m_FontId].GetStringWidthHeight(TaggedText, &wideheight);
                 rect->top += wideheight;
             } else if (GetLineCount(taggedText) > GetLineCount(TaggedText))
             {
-                float wideheight;
-                m_aFonts[m_FontId].GetStringWidthHeight(TaggedText, wideheight);
+                m_aFonts[m_FontId].GetStringWidthHeight(TaggedText, &wideheight);
                 rect->top -= wideheight;
             }
 
@@ -499,6 +501,7 @@ void CNewFonts::PrintString(float x, float y, char *text) {
                 DT_TOP | DT_NOCLIP | DT_WORDBREAK | flag, CFont::m_bFontBackground ? CFont::m_FontBackgroundColor : NULL,
                 (float)(CFont::m_nFontShadow * 2), (float)(CFont::m_nFontOutlineSize * 2), CFont::m_FontDropColor);
         }
+        delete rect;
     }
     else
         CFont::PrintString(x, y, text);
@@ -571,9 +574,9 @@ void CNewFonts::ProcessTags(char *dest, char *src) {
                     break;
                 case 'H':
                 case 'h':
-                    currColor = CRGBA((unsigned char)(min((float)CFont::m_Color->r * 1.5f, 255.0f)),
-                        (unsigned char)(min((float)CFont::m_Color->g * 1.5f, 255.0f)),
-                        (unsigned char)(min((float)CFont::m_Color->b * 1.5f, 255.0f)),
+                    currColor = CRGBA((unsigned char)(std::min((float)(CFont::m_Color->r * 1.5f), 255.0f)),
+                        (unsigned char)(std::min((float)CFont::m_Color->g * 1.5f, 255.0f)),
+                        (unsigned char)(std::min((float)CFont::m_Color->b * 1.5f, 255.0f)),
                         CFont::m_Color->a);
                     i++;
                     break;
@@ -621,7 +624,7 @@ void CNewFonts::ProcessTags(wchar_t *dest, wchar_t *src) {
     FillMemory(text, MAX_TEXT_SIZE, 0);
 
     wcsncpy_s(text, src, wcslen(src));
-    WideSupport::InsertPlayerControlKeysInString(text);
+    WideSupport::InsertPlayerControlKeysInString(text, MAX_TEXT_SIZE);
 
     wchar_t *outText = dest;
     CRGBA currColor(*CFont::m_Color);
@@ -665,9 +668,9 @@ void CNewFonts::ProcessTags(wchar_t *dest, wchar_t *src) {
                     break;
                 case L'H':
                 case L'h':
-                    currColor = CRGBA((unsigned char)(min((float)CFont::m_Color->r * 1.5f, 255.0f)),
-                        (unsigned char)(min((float)CFont::m_Color->g * 1.5f, 255.0f)),
-                        (unsigned char)(min((float)CFont::m_Color->b * 1.5f, 255.0f)),
+                    currColor = CRGBA((unsigned char)(std::min((float)CFont::m_Color->r * 1.5f, 255.0f)),
+                        (unsigned char)(std::min((float)CFont::m_Color->g * 1.5f, 255.0f)),
+                        (unsigned char)(std::min((float)CFont::m_Color->b * 1.5f, 255.0f)),
                         CFont::m_Color->a);
                     i++;
                     break;
@@ -771,7 +774,7 @@ float CNewFont::GetStringWidth(char *str) {
     return (((float)d3drect.right - (float)d3drect.left) * scale_x) / 2.0f;
 }
 
-float CNewFont::GetStringWidthHeight(wchar_t *str, float &height) {
+float CNewFont::GetStringWidthHeight(wchar_t *str, float *height) {
     float scale_x = CFont::m_Scale->x * m_scaleX;
     float scale_y = CFont::m_Scale->y * m_scaleY;
     RECT d3drect; SetRect(&d3drect, 0, 0, 0, 0);
@@ -786,13 +789,13 @@ float CNewFont::GetStringWidthHeight(wchar_t *str, float &height) {
 
     // Values are enclosed between "(" and ")" to prevent the function from
     // returning the wrong value...
-    height = (((float)d3drect.top - (float)d3drect.bottom) * scale_y) / 2.0f;
+    if(height)
+        *height = (((float)d3drect.top - (float)d3drect.bottom) * scale_y) / 2.0f;
     return (((float)d3drect.right - (float)d3drect.left) * scale_x) / 2.0f;
 }
 
 float CNewFont::GetStringWidth(wchar_t* str) {
-    float Height;
-    return GetStringWidthHeight(str,Height);
+    return GetStringWidthHeight(str,nullptr);
 }
 
 void CNewFonts::SetFontStyle(eFontStyle style) {

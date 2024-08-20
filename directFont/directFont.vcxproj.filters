@@ -65,5 +65,6 @@
     <None Include="..\Translations\test.ini">
       <Filter>translations</Filter>
     </None>
+    <None Include="..\copymod.bat" />
   </ItemGroup>
 </Project>
